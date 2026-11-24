@@ -1,0 +1,1380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lesson Slots: turn families' availability into your weekly lesson schedule</title>
+<meta name="description" content="Paste the times each family can do (from your Google Form or just typed). Lesson Slots fits every student into your teaching week, puts siblings back to back, and tells you who to call when someone doesn't fit. Free for up to 12 students, no sign-up.">
+<link rel="canonical" href="https://samsbench.com/lesson-slots/">
+<meta property="og:title" content="Lesson Slots: your fall lesson schedule from families' availability">
+<meta property="og:description" content="Paste the availability, get the week. Siblings back to back, a call list for whoever doesn't fit. Free, no sign-up.">
+<meta property="og:url" content="https://samsbench.com/lesson-slots/">
+<meta property="og:image" content="https://samsbench.com/lesson-slots/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Figtree:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbf8f1; --paper2:#f3eee2; --ink:#18212f; --ink2:#3d4757; --rule:#cfdcea; --rule2:#e6eef6;
+  --margin:#d2453f; --pencil:#2b5fa8; --ok:#1f6b3a; --warn:#a3420c; --focus:#1d4ed8; --card:#ffffff;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.5 Figtree,system-ui,sans-serif}
+h1,h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;line-height:1.1;margin:0}
+h1{font-size:clamp(34px,6vw,60px);letter-spacing:-.01em}
+h2{font-size:clamp(24px,3.2vw,32px)}
+h3{font-size:18px;margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.top{display:flex;align-items:center;gap:10px;padding:14px 0}
+.top b{font-family:"DM Serif Display",Georgia,serif;font-size:22px;font-weight:400}
+.top .sp{flex:1}
+.top a.pro{font-weight:800;text-decoration:none;border:2px solid var(--ink);border-radius:999px;padding:3px 14px;font-size:15px}
+
+/* exercise-book paper: blue rules, red margin */
+.book{background:var(--card) repeating-linear-gradient(180deg,transparent 0 31px,var(--rule2) 31px 32px);border:1px solid var(--rule);border-radius:6px;position:relative;padding:18px 18px 18px 64px}
+.book::before{content:"";position:absolute;left:44px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.7}
+.book .n{position:absolute;left:10px;top:12px;font-family:"DM Serif Display",Georgia,serif;font-size:30px;color:var(--margin);width:28px;text-align:center}
+@media (max-width:640px){ .book{padding:16px 14px 16px 44px} .book::before{left:30px} .book .n{left:2px;font-size:24px} }
+
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:30px;align-items:center;padding:16px 0 10px}
+.hero p.lead{font-size:20px;margin:14px 0 0;max-width:34em}
+.hero .acts{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px}
+.mini{font-size:14px;line-height:1.35}
+.mini .wk{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mini .col{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:6px}
+.mini .col b{display:block;font-size:13px;margin-bottom:4px}
+.mini .t{border-radius:4px;padding:3px 6px;margin-bottom:3px;border-left:4px solid}
+.mini .gl{margin-top:8px;border:2px dashed var(--margin);border-radius:6px;padding:6px 8px;color:var(--ink)}
+@media (max-width:820px){ .hero{grid-template-columns:1fr} }
+
+section.step{margin-top:28px}
+.step > header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:12px}
+.step > header p{margin:0;flex-basis:100%;color:var(--ink2)}
+.btn{border:2px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:8px;padding:9px 16px;font-weight:800}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.small{padding:4px 10px;font-size:15px;border-radius:6px}
+.btn.big{font-size:20px;padding:12px 22px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+select,input[type=text],input[type=email],textarea{border:2px solid var(--rule);background:#fff;border-radius:6px;padding:6px 8px;min-width:0}
+select:focus,input:focus,textarea:focus{border-color:var(--ink)}
+.note{background:var(--paper2);border-radius:6px;padding:10px 12px;margin-top:10px}
+.note.warn{background:#fde7d6}
+.tag{display:inline-block;border-radius:4px;padding:0 6px;font-size:13px;font-weight:800;background:var(--paper2)}
+.tag.red{background:#fbd9d6;color:#8a1c16}
+.tag.ex{background:#ffe9a8;color:#5a4300}
+
+/* hours */
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.day{border:1px solid var(--rule);background:#fff;border-radius:6px;padding:8px 10px}
+.day.off{background:transparent;opacity:.8}
+.day label.dn{font-weight:800;display:flex;align-items:center;gap:8px}
+.day .blk{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.day .blk select{padding:4px 6px}
+.opts{display:flex;flex-wrap:wrap;gap:14px 22px;margin-top:14px}
+.opts label{display:flex;align-items:center;gap:8px;font-weight:600;flex-wrap:wrap}
+.opts select{max-width:100%}
+
+/* roster */
+textarea#paste{width:100%;min-height:150px;font:15px/1.45 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+.help{margin-top:8px}
+.help summary{cursor:pointer;font-weight:800}
+.help code{background:var(--paper2);padding:0 4px;border-radius:3px}
+table.roster{width:100%;border-collapse:collapse;margin-top:12px}
+table.roster th{text-align:left;font-size:14px;padding:4px 6px;border-bottom:2px solid var(--ink)}
+table.roster td{padding:5px 6px;border-bottom:1px solid var(--rule);vertical-align:top}
+table.roster input[type=text]{width:100%}
+table.roster td.nm{width:19%} table.roster td.fm{width:13%} table.roster td.ln{width:80px}
+.parsed{font-size:14px;margin-top:3px}
+.parsed .bad{color:#8a1c16;font-weight:800}
+.rm{border:0;background:transparent;font-size:20px;line-height:1;padding:4px 8px}
+@media (max-width:760px){
+  table.roster thead{display:none}
+  table.roster tr{display:grid;grid-template-columns:1fr 76px 36px;gap:4px 6px;border-bottom:1px solid var(--rule);padding:8px 0}
+  table.roster td{border:0;padding:0;width:auto!important}
+  table.roster td.nm{grid-column:1;grid-row:1} table.roster td.ln{grid-column:2;grid-row:1}
+  table.roster td.tx{grid-column:1 / -1;grid-row:2}
+  table.roster td.fm{grid-column:1 / 3;grid-row:3;display:flex;align-items:center;gap:6px}
+  table.roster td.fm::before{content:"Family";font-size:14px;font-weight:600}
+  table.roster td:last-child{grid-column:3;grid-row:1}
+}
+
+/* result */
+.sum{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:baseline;margin:6px 0 12px}
+.sum .big{font-family:"DM Serif Display",Georgia,serif;font-size:30px}
+.sum span{font-weight:600}
+.board{display:grid;gap:0;border:1px solid var(--rule);border-radius:6px;background:#fff;position:relative;overflow:hidden}
+.board .hd{font-weight:800;text-align:center;padding:6px 0;border-bottom:2px solid var(--ink);background:var(--paper2)}
+.board .axis{position:relative;border-right:1px solid var(--rule)}
+.board .axis i{position:absolute;right:6px;font-style:normal;font-size:12px;color:var(--ink2);transform:translateY(-50%)}
+.board .col{position:relative;border-left:1px solid var(--rule2)}
+.board .open{position:absolute;left:0;right:0;background:repeating-linear-gradient(180deg,#fff 0 calc(var(--q) - 1px),var(--rule2) calc(var(--q) - 1px) var(--q))}
+.board .closed{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,#f3f0ea 0 6px,#ebe6db 6px 8px)}
+.tile{position:absolute;left:4px;right:4px;border-radius:5px;padding:2px 6px;font-size:14px;line-height:1.2;overflow:hidden;border:1px solid rgba(0,0,0,.18);border-left:6px solid var(--c);background:var(--bg);cursor:pointer;text-align:left}
+.tile b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile small{font-size:12px;color:var(--ink2)}
+.tile.sel{outline:3px solid var(--ink);z-index:3}
+.tile.pin::after{content:"📌";position:absolute;right:3px;top:1px;font-size:11px}
+.tile.sib{box-shadow:inset 0 -3px 0 var(--c)}
+.spot{position:absolute;left:4px;right:4px;border:2px dashed var(--ok);border-radius:5px;background:rgba(31,107,58,.08);font-size:12px;font-weight:800;color:var(--ok);padding:1px 6px;z-index:2;cursor:pointer;text-align:left}
+.spot.swap{border-color:var(--pencil);color:var(--pencil);background:rgba(43,95,168,.08)}
+.list{display:none}
+.list .ld{margin-top:10px}
+.list .ld h3{border-bottom:2px solid var(--ink);padding-bottom:2px}
+.list .li{display:flex;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--rule);cursor:pointer;border-left:6px solid var(--c);background:var(--bg);margin-top:4px;border-radius:4px}
+.list .li .tm{font-weight:800;min-width:118px}
+.list .li.sel{outline:3px solid var(--ink)}
+.movebar{margin-top:10px}
+.movebar .opts2{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+@media (max-width:760px){ .board{display:none} .list{display:block} }
+
+.tray{margin-top:18px;border:2px dashed var(--margin);border-radius:6px;padding:12px 14px;background:#fff}
+.tray h3{color:#8a1c16}
+.ask{border-top:1px solid var(--rule);padding:10px 0}
+.ask:first-of-type{border-top:0}
+.ask p{margin:4px 0}
+.outs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-weight:700;z-index:50;max-width:92vw}
+
+.locked{border:2px solid var(--ink);border-radius:6px;padding:16px;background:#fff}
+.locked .days3{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.locked .days3 span{background:var(--paper2);border-radius:4px;padding:3px 8px;font-weight:800}
+
+#proSec{margin-top:36px;background:var(--ink);color:#f1ede4;border-radius:8px;padding:22px}
+#proSec h2{color:#fff}
+#proSec .price{font-family:"DM Serif Display",Georgia,serif;font-size:46px;color:#ffd36b}
+#proSec .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:24px}
+#proSec .btn{background:#ffd36b;border-color:#ffd36b;color:var(--ink)}
+#proSec input{border-color:#56627a}
+#proSec .ok{color:#a7e3b1;font-weight:800}
+#proSec .err{color:#ffb4b4;font-weight:800}
+@media (max-width:760px){ #proSec .cols{grid-template-columns:1fr} }
+footer{margin:40px 0 30px;font-size:15px;color:var(--ink2)}
+footer p{margin:6px 0}
+
+#printArea{display:none}
+@media print{
+  @page{size:landscape;margin:10mm}
+  body{background:#fff;font-size:11pt}
+  body > *:not(#printArea){display:none!important}
+  #printArea{display:block}
+  .pa-week{display:grid;gap:6px}
+  .pa-day h4{margin:0 0 4px;font-size:12pt;border-bottom:1.5pt solid #000}
+  .pa-l{display:flex;gap:6px;padding:2px 0;border-bottom:.5pt solid #bbb;break-inside:avoid}
+  .pa-l b{min-width:88px}
+  .pa-foot{margin-top:8px;font-size:8pt;color:#444}
+  .pa-un{margin-top:10px;border:1pt dashed #000;padding:6px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><b>Lesson Slots</b><span class="sp"></span><a class="pro" href="#proSec">Pro</a></div>
+
+  <div class="hero">
+    <div>
+      <h1>Every family's "we can do Tuesdays after 4", fitted into one week.</h1>
+      <p class="lead">Paste the times each family can come, straight from your sign-up form or typed the way they wrote it. Lesson Slots builds your weekly schedule, keeps siblings back to back, and lists who to call when someone doesn't fit.</p>
+      <div class="acts"><button class="btn big" id="goPaste">Paste my families' times</button><button class="btn ghost big" id="goExample">Try a sample studio</button></div>
+    </div>
+    <div class="mini book" aria-hidden="true">
+      <div class="wk">
+        <div class="col"><b>Mon</b><div class="t" style="border-color:#c0392b;background:#fbe3df">3:00 Grace</div><div class="t" style="border-color:#1f5fbf;background:#e1ebfa">3:30 Isabella</div></div>
+        <div class="col"><b>Tue</b><div class="t" style="border-color:#8e44ad;background:#efe2f5">3:15 Olivia · 60</div><div class="t" style="border-color:#1e8449;background:#dff2e6">4:15 Sophia</div></div>
+        <div class="col"><b>Wed</b><div class="t" style="border-color:#d35400;background:#fde9d9">5:15 Emma</div><div class="t" style="border-color:#d35400;background:#fde9d9">5:45 Leo · 45</div></div>
+      </div>
+      <div class="gl">Didn't fit: Grace only listed Mon 3–4, and it's full. Open to offer: Mon 4:00, Thu 4:45.</div>
+    </div>
+  </div>
+
+  <section class="step book" id="hoursSec">
+    <span class="n">1</span>
+    <header><h2>When do you teach?</h2><p>Tick your teaching days. Add a second block for a dinner break or a morning.</p></header>
+    <div class="days" id="days"></div>
+    <div class="opts">
+      <label>Usual lesson length <select id="defLen"><option>20</option><option selected>30</option><option>40</option><option>45</option><option>60</option></select> min</label>
+      <label>Lessons start <select id="align"><option value="15" selected>:00 :15 :30 :45</option><option value="5">any 5 minutes</option><option value="30">:00 and :30</option></select></label>
+      <label>Break between lessons <select id="buffer"><option value="0" selected>none</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></label>
+    </div>
+  </section>
+
+  <section class="step book" id="rosterSec">
+    <span class="n">2</span>
+    <header><h2>Who's coming, and when can they?</h2><p>Paste rows from your Google Form or spreadsheet (copy the cells, paste here), or type one student per line: <b>Name: the times they gave you</b>. Same last name = siblings.</p></header>
+    <textarea id="paste" spellcheck="false" placeholder="Emma Chen: Mon 3-5, Wed after 4:30&#10;Leo Chen: Mon 3-5, Wed after 4:30 (45 min)&#10;Ava Patel: Tue/Thu 3:30-6&#10;Liam Johnson: after 5 any day but Wed"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="readBtn">Read these</button><button class="btn ghost small" id="addRow">+ Add a student</button><span id="readMsg"></span></div>
+    <details class="help"><summary>What can families write?</summary>
+      <p>Things like <code>Mon 3-5</code>, <code>M/W/F 3:30-6pm</code>, <code>Tuesdays 4pm or later</code>, <code>any weekday after 4 except Fri</code>, <code>Thu 15:30-17:00</code>, <code>Sat morning</code>, <code>anytime</code>, <code>Mon 3-6 but not 4-5</code>. A single time like <code>Tue 4:15</code> means "can start at 4:15". Lesson length: add <code>45 min</code> or <code>1 hr</code> anywhere on the line. A preferred time: <code>prefer Thu 5</code>. Siblings with different last names: add <code>family: Lee</code>.</p>
+      <p>From a Google Form: open the responses spreadsheet, select the rows including the header row, copy, paste. Columns with a day in the header (for example a checkbox grid "Times [Monday]") are read as that day. One row with "Emma &amp; Leo Chen" becomes two students.</p>
+    </details>
+    <div id="rosterWrap"></div>
+  </section>
+
+  <section class="step book" id="resultSec">
+    <span class="n">3</span>
+    <header><h2>Your week</h2><p>Click a lesson to see where else it could go, then click a dashed spot to move it. Moved lessons stay put when you rebuild.</p></header>
+    <div class="row"><button class="btn big" id="solveBtn">Build my week</button><button class="btn ghost" id="rerollBtn" hidden>Try another arrangement</button></div>
+    <div id="result"></div>
+  </section>
+
+  <section id="proSec">
+    <div class="cols">
+      <div>
+        <h2>Lesson Slots Pro</h2>
+        <p>Free schedules up to 12 students. Pro fits your whole studio, 13 students or 130, for every term you schedule.</p>
+        <p><span class="price" id="proPrice">$19</span> once. No subscription, no account.</p>
+        <div id="proBuy"><a class="btn big" id="buyLink" href="#" target="_blank" rel="noopener">Get Pro</a></div>
+        <div id="proState"></div>
+      </div>
+      <div>
+        <label for="proKey"><b>Already bought, or got a gift code? Enter it here.</b></label>
+        <div class="row" style="margin-top:8px"><input type="text" id="proKey" autocomplete="email" placeholder="email you paid with, or gift code" style="flex:1 1 220px"><button class="btn" id="proGo">Unlock</button></div>
+        <p id="proMsg" aria-live="polite"></p>
+        <p class="mini" style="color:#d6d0c4">Pro is checked once on this browser. On another computer, enter the same email or code.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Everything you type stays in this browser. Student names never leave your computer. The page counts visits anonymously, and checks your purchase email only when you unlock Pro.</p>
+    <p>Lesson Slots is made by Sam's Bench · <a href="https://samsbench.com/">samsbench.com</a></p>
+  </footer>
+</div>
+<div id="printArea"></div>
+
+<script>
+/*CORE-START*/
+var LS = (function(){
+'use strict';
+var DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+var DAY_LONG = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+var DAYWORD = [
+  [/^mon(day|days|\.)?s?$/, 0], [/^tue(s|sday|sdays|\.)?$/, 1], [/^tu$/, 1], [/^wed(s|nesday|nesdays|\.)?$/, 2],
+  [/^thu(r|rs|rsday|rsdays|\.)?$/, 3], [/^th$/, 3], [/^fri(day|days|\.)?$/, 4], [/^sat(urday|urdays|\.)?$/, 5], [/^sun(day|days|\.)?$/, 6]
+];
+function dayOfWord(w){ w = w.toLowerCase(); for(var i = 0; i < DAYWORD.length; i++) if(DAYWORD[i][0].test(w)) return DAYWORD[i][1]; return -1; }
+
+/* ---------- intervals (minutes from midnight) ---------- */
+function merge(iv){
+  iv = iv.filter(function(x){ return x[1] > x[0]; }).map(function(x){ return [x[0], x[1]]; }).sort(function(a, b){ return a[0] - b[0]; });
+  var out = [];
+  iv.forEach(function(x){ var l = out[out.length - 1]; if(l && x[0] <= l[1]) l[1] = Math.max(l[1], x[1]); else out.push(x); });
+  return out;
+}
+function intersect(a, b){
+  var out = [];
+  a.forEach(function(x){ b.forEach(function(y){ var s = Math.max(x[0], y[0]), e = Math.min(x[1], y[1]); if(e > s) out.push([s, e]); }); });
+  return merge(out);
+}
+function subtract(a, b){
+  var out = merge(a);
+  b.forEach(function(y){
+    var nx = [];
+    out.forEach(function(x){
+      if(y[1] <= x[0] || y[0] >= x[1]){ nx.push(x); return; }
+      if(y[0] > x[0]) nx.push([x[0], y[0]]);
+      if(y[1] < x[1]) nx.push([y[1], x[1]]);
+    });
+    out = nx;
+  });
+  return out;
+}
+function total(iv){ return iv.reduce(function(s, x){ return s + x[1] - x[0]; }, 0); }
+function emptyWeek(){ return [[], [], [], [], [], [], []]; }
+
+function fmt(m, opt){
+  m = Math.round(m); var h = Math.floor(m / 60) % 24, mm = m % 60;
+  if(opt && opt.h24) return h + ':' + (mm < 10 ? '0' : '') + mm;
+  var ap = h < 12 ? 'am' : 'pm', h12 = h % 12 || 12;
+  return h12 + (mm ? ':' + (mm < 10 ? '0' : '') + mm : '') + (opt && opt.noSuffix ? '' : ap);
+}
+function fmtRange(s, e, opt){
+  var sameHalf = (s < 720) === (e <= 720);
+  if(opt && opt.h24) return fmt(s, opt) + '–' + fmt(e, opt);
+  return (sameHalf ? fmt(s, {noSuffix:true}) : fmt(s)) + '–' + fmt(e);
+}
+
+/* ---------- availability text -> week of intervals ----------
+   Accepts what families actually type or what a Google Form exports:
+   "Mon 3-5, Wed after 4:30", "M/W/F 3:30-6pm", "Tuesdays 4pm or later", "any weekday after 4 except Fri",
+   "Monday 3:00 - 3:30, 3:30 - 4:00", "Thu 15:30-17:00", "Sat morning", "anytime", "not Tuesday".
+   hours = teacher's week (array of 7 interval lists); used for "anytime" and for guessing am/pm when it isn't written.
+   len = lesson length; a bare time ("4:30") means "can start at 4:30". */
+var TIME = '(\\d{1,2})(?:[:.](\\d{2}))?(?:\\s*(am|pm|a\\.m\\.|p\\.m\\.|a|p)(?![a-z]))?';
+var RE_RANGE = new RegExp('^' + TIME + '\\s*(?:-|–|—|to|until|till|til|thru|through)\\s*' + TIME);
+var RE_TIME = new RegExp('^' + TIME);
+function ampm(s){ if(!s) return ''; s = s.toLowerCase().replace(/\./g, ''); return s[0] === 'a' ? 'am' : 'pm'; }
+function hm(h, m, ap){
+  h = +h; m = +(m || 0);
+  if(m > 59 || h > 24) return null;
+  if(ap === 'am') return (h % 12) * 60 + m;
+  if(ap === 'pm') return (h % 12 + 12) * 60 + m;
+  return null;
+}
+/* options for an unmarked hour: [am, pm] minutes, or one absolute value for 0, 13..23 */
+function opts(h, m){
+  h = +h; m = +(m || 0);
+  if(m > 59 || h > 24) return [];
+  if(h === 0 || h >= 13) return [(h % 24) * 60 + m];
+  if(h === 12) return [720 + m, m];          // "12" = noon first
+  return [h * 60 + m, (h + 12) * 60 + m];
+}
+function dayHours(hours, days){
+  var u = [];
+  days.forEach(function(d){ (hours[d] || []).forEach(function(x){ u.push(x); }); });
+  return merge(u);
+}
+function guessScore(iv, ref){                 // how plausible an interpretation is: overlap with teaching hours, else a school-day prior
+  var ov = total(intersect([iv], ref));
+  var prior = (iv[0] >= 7 * 60 && iv[1] <= 22 * 60) ? 1 : 0;
+  var pmBias = iv[0] >= 13 * 60 && iv[0] < 21 * 60 ? 0.5 : 0;
+  return ov * 10 + prior + pmBias;
+}
+function resolveRange(a, b, ref){
+  // a/b: {h,m,ap}. Explicit markers win; a marker on one side carries to the other if that keeps start < end.
+  // Unmarked: same half of the day first ("3-5" = 3pm-5pm or 3am-5am), crossing noon only when that's the only way ("10-2").
+  var A = a.ap ? [hm(a.h, a.m, a.ap)] : opts(a.h, a.m), B = b.ap ? [hm(b.h, b.m, b.ap)] : opts(b.h, b.m);
+  if(!a.ap && b.ap){ var t = hm(a.h, a.m, b.ap); if(t !== null && t < B[0]) A = [t]; }
+  if(a.ap && !b.ap){ var t2 = hm(b.h, b.m, a.ap); if(t2 !== null && t2 > A[0]) B = [t2].concat(B.filter(function(x){ return x !== t2; })); }
+  var pairs = [];
+  A.forEach(function(s, i){ B.forEach(function(e, j){
+    if(s === null || e === null) return;
+    if(e === 0 && s > 0) e = 1440;
+    if(e <= s || e - s > 14 * 60) return;
+    pairs.push({iv: [s, e], same: (s < 720) === (e <= 720) || (A.length === 1 || B.length === 1), rank: i + j});
+  }); });
+  if(pairs.some(function(p){ return p.same; })) pairs = pairs.filter(function(p){ return p.same; });
+  var best = null, bs = -Infinity;
+  pairs.forEach(function(p){ var sc = guessScore(p.iv, ref) - p.rank * 0.01; if(sc > bs){ bs = sc; best = p.iv; } });
+  return best;
+}
+function resolvePoint(p, ref, after){
+  // which reading puts the time itself inside (or just around) the teaching hours
+  var C = p.ap ? [hm(p.h, p.m, p.ap)] : opts(p.h, p.m), best = null, bs = -Infinity;
+  var lo = ref.length ? ref[0][0] : 15 * 60, hi = ref.length ? ref[ref.length - 1][1] : 20 * 60;
+  C.forEach(function(t, i){
+    if(t === null) return;
+    var sc = (t >= lo - 120 && t <= hi + 60) ? 10 : 0;
+    if(t >= 7 * 60 && t <= 22 * 60) sc += 1;
+    if(t >= 13 * 60 && t < 21 * 60) sc += 0.5;
+    sc -= i * 0.01;
+    if(sc > bs){ bs = sc; best = t; }
+  });
+  return best;
+}
+var WORDS_ANY = /^(any ?time|anytime|all ?day|any|open|flexible|whenever|free|available|yes|ok|okay|x|✓|✔)$/;
+var NAMED = {morning: [8 * 60, 12 * 60], mornings: [8 * 60, 12 * 60], afternoon: [12 * 60, 17 * 60], afternoons: [12 * 60, 17 * 60],
+             evening: [17 * 60, 22 * 60], evenings: [17 * 60, 22 * 60], noon: [12 * 60, 13 * 60], lunchtime: [12 * 60, 13 * 60]};
+
+function tokenize(text){
+  // split into words and punctuation we care about; keep times like 3:30pm, 3-5 together as raw text for regex scanning
+  return text.replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim();
+}
+/* Day-letter clusters people type: MWF, TTh, M/W, T-Th, M-F. Returns list of days or null. */
+function letterCluster(w){
+  var map = {m: 0, t: 1, tu: 1, w: 2, th: 3, r: 3, f: 4, sa: 5, su: 6, s: 5};
+  var raw = w;
+  if(/^[MTWRFS](?:h|u|a)?(?:[\/,&+]?[MTWRFS](?:h|u|a)?)+$/.test(raw) || /^(M|T|Tu|W|Th|R|F)$/.test(raw)){
+    var parts = raw.match(/Th|Tu|Sa|Su|[MTWRFS]/g), out = [];
+    if(!parts) return null;
+    for(var i = 0; i < parts.length; i++){ var d = map[parts[i].toLowerCase()]; if(d === undefined) return null; if(out.indexOf(d) < 0) out.push(d); }
+    return out;
+  }
+  return null;
+}
+function dayRange(a, b){ var out = []; if(a < 0 || b < 0) return out; for(var d = a; ; d = (d + 1) % 7){ out.push(d); if(d === b || out.length > 7) break; } return out; }
+
+function parseAvail(text, hours, len){
+  hours = hours || emptyWeek(); len = len || 30;
+  var avail = emptyWeek(), minus = emptyWeek(), notes = [];
+  var s = tokenize(String(text || ''));
+  if(!s) return {avail: avail, empty: true, notes: notes};
+  var teachDays = []; for(var d = 0; d < 7; d++) if((hours[d] || []).length) teachDays.push(d);
+  if(!teachDays.length) teachDays = [0, 1, 2, 3, 4];
+
+  var cur = {days: [], times: [], neg: false, fresh: true};   // a clause: some days + some times
+  var clauses = [];
+  function close(){
+    if(cur.days.length || cur.times.length) clauses.push(cur);
+    cur = {days: [], times: [], neg: false, fresh: true};
+  }
+  var i = 0, low = s.toLowerCase(), pendingNeg = false;
+  function addT(t){ if(pendingNeg){ cur.neg = true; pendingNeg = false; } cur.times.push(t); }
+  while(i < s.length){
+    var rest = s.slice(i), lrest = low.slice(i), m;
+    if(/^[\s,;|\/&+]/.test(rest)){
+      if(/^[;|\n]/.test(rest)){ close(); }
+      i++; continue;
+    }
+    // negation words
+    if((m = lrest.match(/^(except|not|no|but not|busy|can'?t do|cannot do|can'?t|cannot|unavailable|excluding|but(?=\s+(mon|tue|wed|thu|fri|sat|sun)))\b/))){
+      if(cur.times.length || cur.days.length) close();
+      pendingNeg = true; i += m[0].length; continue;
+    }
+    // ranges of days: "Mon-Thu", "Monday through Wednesday", "M-F"
+    if((m = rest.match(/^([A-Za-z]{1,9})\.?\s*(?:-|to|through|thru)\s*([A-Za-z]{1,9})\.?(?![A-Za-z])/))){
+      var da = dayOfWord(m[1]), db = dayOfWord(m[2]);
+      if(da < 0){ var ca = letterCluster(m[1]); if(ca && ca.length === 1) da = ca[0]; }
+      if(db < 0){ var cb = letterCluster(m[2]); if(cb && cb.length === 1) db = cb[0]; }
+      if(da >= 0 && db >= 0){
+        if(cur.times.length && cur.days.length){ close(); }
+        if(pendingNeg){ cur.neg = true; pendingNeg = false; }
+        dayRange(da, db).forEach(function(x){ if(cur.days.indexOf(x) < 0) cur.days.push(x); });
+        i += m[0].length; continue;
+      }
+    }
+    if((m = rest.match(/^[A-Za-z]+\.?/))){
+      var w = m[0].replace(/\.$/, ''), lw = w.toLowerCase(), dd = dayOfWord(lw), cl = null;
+      if(dd < 0 && (lw === 'weekdays' || lw === 'weekday')) cl = [0, 1, 2, 3, 4];
+      else if(dd < 0 && (lw === 'weekends' || lw === 'weekend')) cl = [5, 6];
+      else if(dd < 0 && (lw === 'daily' || lw === 'everyday')) cl = teachDays.slice();
+      else if(dd < 0) cl = letterCluster(w);
+      if(dd >= 0) cl = [dd];
+      if(cl){
+        if(cur.times.length && cur.days.length){ close(); }
+        if(pendingNeg){ cur.neg = true; pendingNeg = false; }
+        cl.forEach(function(x){ if(cur.days.indexOf(x) < 0) cur.days.push(x); });
+        i += m[0].length; continue;
+      }
+      if(lw === 'every' && /^every\s+day\b/.test(lrest)){ teachDays.forEach(function(x){ if(cur.days.indexOf(x) < 0) cur.days.push(x); }); i += lrest.match(/^every\s+day/)[0].length; continue; }
+      if(lw === 'after' && /^after\s+school\b/.test(lrest)){ addT({kind: 'abs', iv: [15 * 60, 24 * 60]}); i += 12; continue; }
+      if(NAMED[lw]){ addT({kind: 'abs', iv: NAMED[lw].slice()}); i += w.length; continue; }
+      var wlen = m[0].length, mw;
+      if((mw = lrest.match(/^any\s*(day|weekday)s?\b/))){ if(cur.times.length && cur.days.length) close(); if(pendingNeg){ cur.neg = true; pendingNeg = false; } (mw[1] === 'day' ? teachDays : [0, 1, 2, 3, 4]).forEach(function(x){ if(cur.days.indexOf(x) < 0) cur.days.push(x); }); i += mw[0].length; continue; }
+      if((mw = lrest.match(/^(any\s?time|all\s?day)\b/)) || (WORDS_ANY.test(lw) && (lw !== 'any' || /^any\s*($|[,;.)])/.test(lrest)))){
+        addT({kind: 'any'}); i += mw ? mw[0].length : wlen; continue;
+      }
+      if((mw = lrest.match(/^(after|from|starting( at)?|past|later than|no earlier than)\s+/))){
+        var p = lrest.slice(mw[0].length).match(RE_TIME);
+        if(p){ addT({kind: 'after', p: {h: p[1], m: p[2], ap: ampm(p[3])}}); i += mw[0].length + p[0].length; continue; }
+      }
+      if((mw = lrest.match(/^(before|until|till|til|by|no later than|earlier than)\s+/))){
+        var p2 = lrest.slice(mw[0].length).match(RE_TIME);
+        if(p2){ addT({kind: 'before', p: {h: p2[1], m: p2[2], ap: ampm(p2[3])}}); i += mw[0].length + p2[0].length; continue; }
+      }
+      i += wlen; continue;    // other words: "at", "or", "and", "lessons", names of the form question...
+    }
+    if((m = rest.match(RE_RANGE))){
+      addT({kind: 'range', a: {h: m[1], m: m[2], ap: ampm(m[3])}, b: {h: m[4], m: m[5], ap: ampm(m[6])}});
+      i += m[0].length; continue;
+    }
+    if((m = rest.match(/^[<>]=?\s*/))){
+      var p3 = rest.slice(m[0].length).match(RE_TIME);
+      if(p3){ addT({kind: m[0][0] === '>' ? 'after' : 'before', p: {h: p3[1], m: p3[2], ap: ampm(p3[3])}}); i += m[0].length + p3[0].length; continue; }
+    }
+    if((m = rest.match(RE_TIME))){
+      var after = rest.slice(m[0].length).match(/^\s*(\+|or later|and later|onwards?|or after|and after|on\b)/i);
+      var before = !after && rest.slice(m[0].length).match(/^\s*(or earlier|and earlier|or before)/i);
+      if(after){ addT({kind: 'after', p: {h: m[1], m: m[2], ap: ampm(m[3])}}); i += m[0].length + after[0].length; continue; }
+      if(before){ addT({kind: 'before', p: {h: m[1], m: m[2], ap: ampm(m[3])}}); i += m[0].length + before[0].length; continue; }
+      addT({kind: 'point', p: {h: m[1], m: m[2], ap: ampm(m[3])}});
+      i += m[0].length; continue;
+    }
+    i++;
+  }
+  close();
+  if(pendingNeg && clauses.length === 0) return {avail: avail, empty: true, notes: notes};
+
+  // a clause with times but no days borrows the days of the clause before it ("Mon 3-4, 5-6"),
+  // or, if it is the first, means every teaching day ("after 4", "anytime")
+  var lastDays = null;
+  clauses.forEach(function(c){
+    if(!c.days.length){ c.days = lastDays ? lastDays.slice() : teachDays.slice(); c.borrowed = true; }
+    else lastDays = c.days;
+  });
+  clauses.forEach(function(c){
+    var ref = dayHours(hours, c.days); if(!ref.length) ref = [[15 * 60, 20 * 60]];
+    var ivs = [];
+    if(!c.times.length) ivs.push([0, 24 * 60]);
+    c.times.forEach(function(t){
+      if(t.kind === 'any') ivs.push([0, 24 * 60]);
+      else if(t.kind === 'abs') ivs.push(t.iv);
+      else if(t.kind === 'range'){ var r = resolveRange(t.a, t.b, ref); if(r) ivs.push(r); else notes.push('skipped a time range'); }
+      else if(t.kind === 'after'){ var x = resolvePoint(t.p, ref, 'after'); if(x !== null) ivs.push([x, 24 * 60]); }
+      else if(t.kind === 'before'){ var y = resolvePoint(t.p, ref, 'before'); if(y !== null) ivs.push([0, y]); }
+      else if(t.kind === 'point'){ var z = resolvePoint(t.p, ref, 'point'); if(z !== null) ivs.push([z, z + len]); }
+    });
+    c.days.forEach(function(d){
+      var tgt = c.neg ? minus : avail;
+      ivs.forEach(function(iv){ tgt[d].push(iv); });
+    });
+  });
+  // "except Fri" alone (only negative clauses): start from every teaching day
+  var anyPos = clauses.some(function(c){ return !c.neg; });
+  if(!anyPos) teachDays.forEach(function(d){ avail[d].push([0, 24 * 60]); });
+  for(var k = 0; k < 7; k++){ avail[k] = subtract(merge(avail[k]), merge(minus[k])); }
+  return {avail: avail, empty: avail.every(function(x){ return !x.length; }), notes: notes};
+}
+
+function availText(avail, hours){   // a week back to short text, clipped to teaching hours when given
+  var parts = [];
+  for(var d = 0; d < 7; d++){
+    var iv = hours ? intersect(avail[d], hours[d] || []) : avail[d];
+    if(!iv.length) continue;
+    parts.push(DAY_NAMES[d] + ' ' + iv.map(function(x){ return fmtRange(x[0], x[1]); }).join(', '));
+  }
+  return parts.join('; ');
+}
+
+/* ---------- roster: pasted spreadsheet / Google Form export / typed lines -> students ---------- */
+function splitCSVLine(line, delim){
+  var out = [], cur = '', q = false;
+  for(var i = 0; i < line.length; i++){
+    var c = line[i];
+    if(q){ if(c === '"'){ if(line[i + 1] === '"'){ cur += '"'; i++; } else q = false; } else cur += c; }
+    else if(c === '"' && cur === '') q = true;
+    else if(c === delim){ out.push(cur); cur = ''; }
+    else cur += c;
+  }
+  out.push(cur);
+  return out.map(function(x){ return x.trim(); });
+}
+function splitRows(text, delim){       // CSV rows can hold newlines inside quotes (Google Forms "long answer")
+  var rows = [], cur = '', q = false;
+  for(var i = 0; i < text.length; i++){
+    var c = text[i];
+    if(c === '"') q = !q;
+    if((c === '\n' || c === '\r') && !q){ if(c === '\r' && text[i + 1] === '\n') i++; rows.push(cur); cur = ''; continue; }
+    cur += c;
+  }
+  if(cur) rows.push(cur);
+  return rows.filter(function(r){ return r.trim(); }).map(function(r){ return splitCSVLine(r, delim).map(function(x){ return x.replace(/\s*\n\s*/g, ', '); }); });
+}
+function parseLen(s){
+  var m = String(s).match(/(\d+(?:\.\d+)?)\s*(?:-\s*)?(hours?|hrs?|h)\b/i);
+  if(m) return {len: Math.round(parseFloat(m[1]) * 60), raw: m[0]};
+  m = String(s).match(/(\d{2,3})\s*(?:-\s*)?(minutes?|mins?|m)\b/i);
+  if(m && +m[1] >= 10 && +m[1] <= 180) return {len: +m[1], raw: m[0]};
+  return null;
+}
+function hasDay(s){ return /\b(mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun)[a-z]*\b|\bweekdays?\b|\b[MTWRF](?:h)?(?:\/[MTWRF](?:h)?)+\b/i.test(s); }
+function lastName(n){ var p = n.trim().split(/\s+/); return p.length > 1 ? p[p.length - 1] : ''; }
+function cleanName(n){ return String(n || '').replace(/\s+/g, ' ').replace(/^[\s\-–•*\d.)]+/, '').trim(); }
+function splitKids(name){
+  // "Emma & Leo Chen", "Emma and Leo", "Emma, Leo Chen" -> two students, shared last name
+  var n = cleanName(name);
+  if(!/(\s&\s|\sand\s|,\s*|\s\+\s)/i.test(n)) return [n];
+  var parts = n.split(/\s*(?:&|\band\b|,|\+)\s*/i).map(function(x){ return x.trim(); }).filter(Boolean);
+  if(parts.length < 2) return [n];
+  var ln = lastName(parts[parts.length - 1]);
+  return parts.map(function(p){ return p.indexOf(' ') < 0 && ln ? p + ' ' + ln : p; });
+}
+
+function parseRoster(text, defLen){
+  defLen = defLen || 30;
+  var t = String(text || '').replace(/\r\n?/g, '\n').trim(), students = [], warnings = [];
+  if(!t) return {students: students, warnings: warnings, format: 'empty'};
+  var first = t.split('\n')[0], delim = null;
+  if(first.indexOf('\t') >= 0) delim = '\t';
+  else if((first.match(/,/g) || []).length >= 2 && /name|student|timestamp|child/i.test(first)) delim = ',';
+  if(delim){
+    var rows = splitRows(t, delim), head = rows[0].map(function(h){ return h.toLowerCase(); });
+    var isHeader = head.some(function(h){ return /name|student|child|timestamp|avail|monday|tuesday|time/.test(h); });
+    if(isHeader) return fromTable(rows, defLen, warnings);
+  }
+  // typed lines: "Emma Chen: Mon 3-5, Wed after 4 (45 min)" / "Leo Chen - Tue 4-6" / "Mia | 30 | Thu 3:30-5"
+  t.split('\n').forEach(function(line, ln){
+    line = line.trim(); if(!line || /^#/.test(line)) return;
+    var name, rest, family = '', pref = '';
+    var cells = line.indexOf('|') >= 0 ? line.split('|') : line.indexOf('\t') >= 0 ? line.split('\t') : null;
+    if(cells){ name = cells[0]; rest = cells.slice(1).join(', '); }
+    else {
+      var m = line.match(/^([^:\-–(\d]+?)\s*(?::|\s[-–]\s|\()\s*(.*)$/);
+      if(m){ name = m[1]; rest = (line[m[0].length - m[2].length - 1] === '(' ? '(' : '') + m[2]; }
+      else {
+        // no separator: name is everything before the first day word / digit
+        var k = line.search(/\b(mon|monday|mondays|tue|tues|tuesday|tuesdays|wed|weds|wednesday|wednesdays|thu|thur|thurs|thursday|thursdays|fri|friday|fridays|sat|saturday|saturdays|sun|sunday|sundays|weekdays?|any|anytime|after|before|[MTWRF](?:h)?(?:\/[MTWRF]h?)+)\b|\d/i);
+        if(k <= 0){ warnings.push('Line ' + (ln + 1) + ': no times found in "' + line.slice(0, 40) + '"'); name = line; rest = ''; }
+        else { name = line.slice(0, k); rest = line.slice(k); }
+      }
+    }
+    var fm = rest.match(/\(?\b(?:family|fam|sibling of|sister of|brother of|with)\s*:?\s*([A-Za-z][A-Za-z'\- ]*?)\)?(?=[,;]|$|\))/i);
+    if(fm){ family = fm[1].trim(); rest = rest.replace(fm[0], ' '); }
+    var pm = rest.match(/\b(?:prefer(?:s|red)?|best|ideally|first choice)\s*:?\s*([^;()]*)/i);
+    if(pm){ pref = pm[1]; rest = rest.replace(pm[0], ' '); }
+    var L = parseLen(rest); if(L) rest = rest.replace(L.raw, ' ');
+    rest = rest.replace(/[()]/g, ' ');
+    splitKids(name).forEach(function(nm){
+      if(!nm) return;
+      students.push({name: nm, family: family || lastName(nm), len: L ? L.len : defLen, availText: rest.trim(), prefText: pref.trim()});
+    });
+  });
+  return {students: students, warnings: warnings, format: 'lines'};
+}
+function fromTable(rows, defLen, warnings){
+  var head = rows[0], H = head.map(function(h){ return h.toLowerCase(); }), students = [];
+  var col = {name: -1, first: -1, last: -1, family: -1, len: -1, pref: [], days: [], timesHead: [], avail: [], name2: []};
+  H.forEach(function(h, i){
+    var dd = -1; DAY_LONG.forEach(function(D, k){ if(h.indexOf(D.toLowerCase()) >= 0 || new RegExp('\\[' + DAY_NAMES[k].toLowerCase()).test(h)) dd = k; });
+    if(/timestamp|e-?mail|phone|address|signature|agree|policy|comment|note/.test(h) && !/avail|time/.test(h)) return;
+    if(/prefer|best time|first choice|ideal/.test(h)){ col.pref.push(i); return; }
+    if(dd >= 0){ col.days.push([i, dd]); return; }
+    if(/\[\s*\d{1,2}([:.]\d{2})?\s*(am|pm)?/.test(h)){ col.timesHead.push(i); return; }
+    if(/(child|student|kid)\s*(#\s*)?[2-6]|second (child|student)|sibling/.test(h) && /name/.test(h)){ col.name2.push(i); return; }
+    if(/first name/.test(h) && col.first < 0){ col.first = i; return; }
+    if(/last name|surname|family name/.test(h) && col.last < 0){ col.last = i; return; }
+    if(/parent|guardian|family|household/.test(h) && col.family < 0){ col.family = i; return; }
+    if(/length|minutes|duration|how long|lesson time/.test(h) && !/avail/.test(h) && col.len < 0){ col.len = i; return; }
+    if(/name|student|child/.test(h) && col.name < 0){ col.name = i; return; }
+    if(/avail|times|when|days|schedule|slot|can you/.test(h)){ col.avail.push(i); return; }
+  });
+  if(col.name < 0 && col.first >= 0) col.name = col.first;
+  if(col.name < 0){ warnings.push('Couldn\'t find a name column. Put the student name in a column called "Name".'); col.name = 0; }
+  rows.slice(1).forEach(function(r, ri){
+    var nm = r[col.name] || '';
+    if(col.first >= 0 && col.last >= 0 && col.name === col.first) nm = (r[col.first] + ' ' + r[col.last]).trim();
+    if(!cleanName(nm)) return;
+    var parts = [];
+    col.days.forEach(function(x){ var v = (r[x[0]] || '').trim(); if(v && !/^(no|none|n\/a|-|not available|unavailable)$/i.test(v)) parts.push(DAY_LONG[x[1]] + ' ' + v); });
+    col.timesHead.forEach(function(i){
+      var v = (r[i] || '').trim(), tm = head[i].match(/\[\s*([^\]]+)\]/);
+      if(v && tm && hasDay(v)) parts.push(v.split(/\s*[,;]\s*/).map(function(day){ return day + ' ' + tm[1]; }).join('; '));
+    });
+    col.avail.forEach(function(i){ var v = (r[i] || '').trim(); if(v) parts.push(v); });
+    if(!col.days.length && !col.timesHead.length && !col.avail.length){
+      r.forEach(function(v, i){ if(i !== col.name && i !== col.family && i !== col.len && hasDay(v || '')) parts.push(v); });
+    }
+    var L = col.len >= 0 ? parseLen(r[col.len] || '') || (/^\d{2,3}$/.test((r[col.len] || '').trim()) ? {len: +r[col.len]} : null) : null;
+    var pref = col.pref.map(function(i){ return r[i] || ''; }).filter(Boolean).join('; ');
+    var fam = col.family >= 0 ? (r[col.family] || '').trim() : '';
+    if(fam && fam.indexOf(' ') > 0) fam = lastName(fam);
+    var names = splitKids(nm);
+    col.name2.forEach(function(i){ if(cleanName(r[i])) names = names.concat(splitKids(r[i])); });
+    if(!fam && names.length > 1) fam = lastName(names[0]) || ('family' + (ri + 2));
+    names.forEach(function(n){
+      if(n.indexOf(' ') < 0 && col.last >= 0 && r[col.last]) n = n + ' ' + r[col.last].trim();
+      students.push({name: n, family: fam || lastName(n), len: L ? L.len : defLen, availText: parts.join('; '), prefText: pref});
+    });
+  });
+  return {students: students, warnings: warnings, format: 'table'};
+}
+
+/* ---------- solver ----------
+   input: {hours: week, students: [{id, name, family, len, avail: week, pref: week, lock: {d, t} | null}], buffer, align, restarts, seed}
+   output: {place: {id: {d, t}}, unplaced: [id], score, stats} */
+function rng(seed){ var s = (seed >>> 0) || 1; return function(){ s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+var W = {PLACE: 100000, SIB_ADJ: 400, SIB_DAY: 120, PREF: 60, GAP: 3, LATE: 0.02};
+
+function candidates(st, hours, align, buffer){
+  var out = [];
+  for(var d = 0; d < 7; d++){
+    var ok = intersect(hours[d] || [], st.avail[d] || []);
+    ok.forEach(function(iv){
+      var t0 = Math.ceil(iv[0] / align) * align;
+      for(var t = t0; t + st.len <= iv[1]; t += align) out.push({d: d, t: t});
+    });
+  }
+  return out;
+}
+function inPref(st, d, t){ var p = st.pref && st.pref[d]; if(!p) return false; for(var i = 0; i < p.length; i++) if(t >= p[i][0] && t + st.len <= p[i][1]) return true; return false; }
+function blockOf(hours, d, t){ var h = hours[d] || []; for(var i = 0; i < h.length; i++) if(t >= h[i][0] && t < h[i][1]) return i; return -1; }
+
+function Solver(input){
+  var self = this;
+  this.hours = input.hours; this.buffer = input.buffer || 0; this.align = Math.max(5, input.align || 5);
+  this.st = input.students.map(function(s, i){ return {i: i, id: s.id, family: (s.family || '').toLowerCase().trim(), len: Math.max(5, s.len || 30), avail: s.avail, pref: s.pref, lock: s.lock || null}; });
+  this.cand = this.st.map(function(s){ return candidates(s, self.hours, self.align, self.buffer); });
+  this.pos = this.st.map(function(){ return null; });    // {d, t}
+}
+Solver.prototype.conflicts = function(i, d, t, ignore){
+  var s = this.st[i], B = this.buffer, out = [];
+  for(var j = 0; j < this.st.length; j++){
+    if(j === i || (ignore && ignore[j])) continue;
+    var p = this.pos[j]; if(!p || p.d !== d) continue;
+    var o = this.st[j];
+    if(t < p.t + o.len + B && p.t < t + s.len + B) out.push(j);
+  }
+  return out;
+};
+Solver.prototype.free = function(i, d, t){ return this.conflicts(i, d, t).length === 0; };
+Solver.prototype.dayScore = function(d){
+  var L = [], self = this;
+  for(var j = 0; j < this.st.length; j++){ var p = this.pos[j]; if(p && p.d === d) L.push(j); }
+  if(!L.length) return 0;
+  L.sort(function(a, b){ return self.pos[a].t - self.pos[b].t; });
+  var sc = 0, B = this.buffer, fam = {};
+  for(var k = 0; k < L.length; k++){
+    var a = L[k], sa = this.st[a];
+    if(sa.family){ fam[sa.family] = (fam[sa.family] || 0) + 1; }
+    if(k + 1 < L.length){
+      var b = L[k + 1], sb = this.st[b], end = this.pos[a].t + sa.len + B, gap = this.pos[b].t - end;
+      if(blockOf(this.hours, d, this.pos[a].t) === blockOf(this.hours, d, this.pos[b].t) && gap > 0) sc -= W.GAP * gap;
+      if(sa.family && sa.family === sb.family && gap <= 10) sc += W.SIB_ADJ;
+    }
+  }
+  for(var f in fam) if(fam[f] > 1) sc += W.SIB_DAY * (fam[f] - 1);
+  sc -= W.LATE * (this.pos[L[L.length - 1]].t + this.st[L[L.length - 1]].len - 15 * 60);
+  return sc;
+};
+Solver.prototype.score = function(){
+  var sc = 0;
+  for(var d = 0; d < 7; d++) sc += this.dayScore(d);
+  for(var j = 0; j < this.st.length; j++){ var p = this.pos[j]; if(p){ sc += W.PLACE; if(inPref(this.st[j], p.d, p.t)) sc += W.PREF; } }
+  return sc;
+};
+Solver.prototype.studentScore = function(j){ var p = this.pos[j]; return p ? W.PLACE + (inPref(this.st[j], p.d, p.t) ? W.PREF : 0) : 0; };
+/* score change if student i moves to c (null = remove), cheaply: only the days touched */
+Solver.prototype.delta = function(i, c){
+  var old = this.pos[i], days = {};
+  if(old) days[old.d] = 1; if(c) days[c.d] = 1;
+  var before = this.studentScore(i), after;
+  for(var d in days) before += this.dayScore(+d);
+  this.pos[i] = c;
+  after = this.studentScore(i); for(var d2 in days) after += this.dayScore(+d2);
+  this.pos[i] = old;
+  return after - before;
+};
+Solver.prototype.bestFree = function(i, R, noise){
+  var best = null, bs = -Infinity, C = this.cand[i];
+  for(var k = 0; k < C.length; k++){
+    var c = C[k]; if(!this.free(i, c.d, c.t)) continue;
+    var v = this.delta(i, c) + (noise ? R() * noise : 0);
+    if(v > bs){ bs = v; best = c; }
+  }
+  return best;
+};
+/* put i somewhere, moving up to `depth` levels of others out of the way (ejection chain). Returns true if done. */
+Solver.prototype.insert = function(i, depth, banned, R){
+  var c = this.bestFree(i, R, 0);
+  if(c){ this.pos[i] = c; return true; }
+  if(depth <= 0) return false;
+  var C = this.cand[i], order = C.map(function(_, k){ return k; });
+  for(var k = order.length - 1; k > 0; k--){ var r = Math.floor(R() * (k + 1)), tmp = order[k]; order[k] = order[r]; order[r] = tmp; }
+  var tries = 0;
+  for(var q = 0; q < order.length && tries < 40; q++){
+    var cc = C[order[q]], conf = this.conflicts(i, cc.d, cc.t), self = this;
+    if(conf.length > 2 || conf.some(function(j){ return banned[j] || self.st[j].lock; })) continue;
+    tries++;
+    var snap = this.snapshot();                            // a failed chain may have moved others deeper down: restore all of it
+    conf.forEach(function(j){ self.pos[j] = null; });
+    this.pos[i] = cc;
+    var nb = Object.assign({}, banned); nb[i] = 1;
+    var ok = true;
+    for(var z = 0; z < conf.length; z++){ if(!this.insert(conf[z], depth - 1, nb, R)){ ok = false; break; } }
+    if(ok) return true;
+    this.restore(snap);
+  }
+  return false;
+};
+Solver.prototype.snapshot = function(){ return this.pos.map(function(p){ return p ? {d: p.d, t: p.t} : null; }); };
+Solver.prototype.restore = function(s){ this.pos = s.map(function(p){ return p ? {d: p.d, t: p.t} : null; }); };
+Solver.prototype.improve = function(R, passes){
+  var n = this.st.length, self = this;
+  for(var pass = 0; pass < passes; pass++){
+    var better = false;
+    for(var i = 0; i < n; i++){
+      if(!this.pos[i] || this.st[i].lock) continue;
+      // move to a better free spot
+      var C = this.cand[i], bestC = null, bv = 0.0001;
+      for(var k = 0; k < C.length; k++){
+        var c = C[k]; if(c.d === this.pos[i].d && c.t === this.pos[i].t) continue;
+        var conf = this.conflicts(i, c.d, c.t);
+        if(conf.length) continue;
+        var v = this.delta(i, c); if(v > bv){ bv = v; bestC = c; }
+      }
+      if(bestC){ this.pos[i] = bestC; better = true; continue; }
+      // swap with another student (both must fit the other's start)
+      for(var j = 0; j < n; j++){
+        if(j === i || !this.pos[j] || this.st[j].lock) continue;
+        var pi = this.pos[i], pj = this.pos[j];
+        if(!this.canAt(i, pj.d, pj.t) || !this.canAt(j, pi.d, pi.t)) continue;
+        var before = this.score();
+        this.pos[i] = pj; this.pos[j] = pi;
+        if(this.conflicts(i, pj.d, pj.t).length || this.conflicts(j, pi.d, pi.t).length || this.score() <= before + 0.0001){ this.pos[i] = pi; this.pos[j] = pj; }
+        else { better = true; break; }
+      }
+    }
+    if(!better) break;
+  }
+};
+Solver.prototype.canAt = function(i, d, t){
+  var C = this.cand[i]; for(var k = 0; k < C.length; k++) if(C[k].d === d && C[k].t === t) return true; return false;
+};
+Solver.prototype.run = function(restarts, seed){
+  var n = this.st.length, self = this, best = null, bestScore = -Infinity;
+  for(var r = 0; r < restarts; r++){
+    var R = rng((seed || 7) * 7919 + r * 104729 + 1);
+    this.pos = this.st.map(function(s){ return s.lock ? {d: s.lock.d, t: s.lock.t} : null; });
+    // most constrained first; siblings together; a little noise after the first pass
+    var famSize = {}; this.st.forEach(function(s){ if(s.family) famSize[s.family] = (famSize[s.family] || 0) + 1; });
+    var famKey = {}; this.st.forEach(function(s, i){ var k = self.cand[i].length; if(s.family){ famKey[s.family] = Math.min(famKey[s.family] === undefined ? 1e9 : famKey[s.family], k); } });
+    var order = this.st.map(function(s, i){ return i; }).filter(function(i){ return !self.st[i].lock; });
+    var key = {}; order.forEach(function(i){ var s = self.st[i]; key[i] = (s.family && famSize[s.family] > 1 ? famKey[s.family] : self.cand[i].length) * (1 + (r ? R() * 0.6 : 0)) + (s.family ? (s.family.charCodeAt(0) % 7) * 0.001 : 0) + i * 1e-6; });
+    order.sort(function(a, b){ return key[a] - key[b]; });
+    for(var q = 0; q < order.length; q++){
+      var i = order[q], c = this.bestFree(i, R, r ? 40 : 0);
+      if(c) this.pos[i] = c;
+    }
+    for(var rep = 0; rep < 2; rep++){
+      var miss = order.filter(function(i){ return !self.pos[i]; });
+      if(!miss.length) break;
+      miss.forEach(function(i){ var snap = self.snapshot(); if(!self.insert(i, 2, {}, R)) self.restore(snap); });
+    }
+    this.improve(R, 6);
+    var sc = this.score();
+    if(sc > bestScore + 1e-6){ bestScore = sc; best = this.snapshot(); }
+  }
+  this.restore(best);
+  return bestScore;
+};
+
+/* Exact branch-and-bound on "how many can be placed at all", within a node budget. Used only when the heuristic leaves
+   someone out, to make sure nobody is left out who could have fit. Adopts the better placement if it finds one. */
+Solver.prototype.exactMax = function(budget){
+  var self = this, n = this.st.length, have = this.pos.filter(Boolean).length, best = have, bestPos = null, nodes = 0;
+  var order = this.st.map(function(s, i){ return i; }).filter(function(i){ return !self.st[i].lock; })
+    .sort(function(a, b){ return self.cand[a].length - self.cand[b].length || a - b; });
+  var cur = this.st.map(function(s){ return s.lock ? {d: s.lock.d, t: s.lock.t} : null; }), locked = cur.filter(Boolean).length;
+  var saved = this.pos; this.pos = cur;
+  (function go(k, placed){
+    if(++nodes > budget) return;
+    if(placed + (order.length - k) <= best) return;
+    if(k === order.length){ best = placed; bestPos = self.snapshot(); return; }
+    var i = order[k], C = self.cand[i];
+    for(var q = 0; q < C.length; q++){
+      var c = C[q]; if(!self.free(i, c.d, c.t)) continue;
+      self.pos[i] = c; go(k + 1, placed + 1); self.pos[i] = null;
+      if(nodes > budget) return;
+    }
+    go(k + 1, placed);
+  })(0, locked);
+  this.pos = saved;
+  if(bestPos && best > have){ this.restore(bestPos); return true; }
+  return false;
+};
+
+function solve(input){
+  var S = new Solver(input), n = S.st.length;
+  var restarts = input.restarts || (n <= 15 ? 60 : n <= 40 ? 30 : 14);
+  // locked students that collide with each other: keep the first, report the rest
+  var lockClash = [];
+  S.st.forEach(function(s, i){
+    if(!s.lock) return;
+    for(var j = 0; j < i; j++){
+      var o = S.st[j]; if(!o.lock || o.lock.d !== s.lock.d) continue;
+      if(s.lock.t < o.lock.t + o.len + S.buffer && o.lock.t < s.lock.t + s.len + S.buffer){ lockClash.push(s.id); s.lock = null; break; }
+    }
+  });
+  var score = S.run(restarts, input.seed || 1);
+  if(S.pos.some(function(p){ return !p; }) && S.exactMax(300000)){ S.improve(rng(5), 6); score = S.score(); }
+  var place = {}, unplaced = [];
+  S.st.forEach(function(s, i){ if(S.pos[i]) place[s.id] = {d: S.pos[i].d, t: S.pos[i].t}; else unplaced.push(s.id); });
+  return {place: place, unplaced: unplaced, score: score, lockClash: lockClash, stats: stats(S)};
+}
+function stats(S){
+  var sibPairs = 0, sibAdj = 0, gaps = 0, pref = 0, prefWanted = 0, days = {};
+  var fams = {};
+  S.st.forEach(function(s, i){ if(s.family){ (fams[s.family] = fams[s.family] || []).push(i); } });
+  for(var f in fams){ var m = fams[f]; if(m.length > 1) sibPairs += m.length - 1; }
+  for(var d = 0; d < 7; d++){
+    var L = []; S.st.forEach(function(s, i){ var p = S.pos[i]; if(p && p.d === d) L.push(i); });
+    if(L.length) days[d] = L.length;
+    L.sort(function(a, b){ return S.pos[a].t - S.pos[b].t; });
+    for(var k = 0; k + 1 < L.length; k++){
+      var a = L[k], b = L[k + 1], gap = S.pos[b].t - (S.pos[a].t + S.st[a].len + S.buffer);
+      if(blockOf(S.hours, d, S.pos[a].t) === blockOf(S.hours, d, S.pos[b].t) && gap > 0) gaps += gap;
+      if(S.st[a].family && S.st[a].family === S.st[b].family && gap <= 10) sibAdj++;
+    }
+  }
+  S.st.forEach(function(s, i){ var has = s.pref && s.pref.some(function(x){ return x.length; }); if(has){ prefWanted++; if(S.pos[i] && inPref(s, S.pos[i].d, S.pos[i].t)) pref++; } });
+  return {sibPairs: sibPairs, sibAdj: sibAdj, gapMin: gaps, pref: pref, prefWanted: prefWanted, perDay: days};
+}
+
+function statsFor(input, place){
+  var S = new Solver(input);
+  S.st.forEach(function(s, i){ var p = place[s.id]; S.pos[i] = p ? {d: p.d, t: p.t} : null; });
+  return stats(S);
+}
+
+/* every legal spot for one student given everyone else fixed: free spots and swap partners */
+function movesFor(input, place, id){
+  var S = new Solver(input), idx = -1;
+  S.st.forEach(function(s, i){ if(s.id === id) idx = i; var p = place[s.id]; S.pos[i] = p ? {d: p.d, t: p.t} : null; });
+  if(idx < 0) return [];
+  var out = [], me = S.pos[idx];
+  S.pos[idx] = null;
+  S.cand[idx].forEach(function(c){
+    if(me && me.d === c.d && me.t === c.t) return;          // where it already is
+    var conf = S.conflicts(idx, c.d, c.t);
+    if(!conf.length) out.push({d: c.d, t: c.t, kind: 'free'});
+    else if(conf.length === 1 && me){
+      var j = conf[0], pj = S.pos[j];
+      if(pj.d === c.d && pj.t === c.t && S.canAt(j, me.d, me.t)){
+        S.pos[j] = me; S.pos[idx] = c;
+        var ok = !S.conflicts(j, me.d, me.t).length && !S.conflicts(idx, c.d, c.t).length;
+        S.pos[j] = pj; S.pos[idx] = null;
+        if(ok) out.push({d: c.d, t: c.t, kind: 'swap', with: S.st[j].id});
+      }
+    }
+  });
+  return out;
+}
+
+/* why a student didn't fit, and what to ask the family */
+function explain(input, place, id){
+  var S = new Solver(input), idx = -1, s;
+  S.st.forEach(function(x, i){ if(x.id === id) idx = i; var p = place[x.id]; S.pos[i] = p ? {d: p.d, t: p.t} : null; });
+  if(idx < 0) return null;
+  s = S.st[idx]; S.pos[idx] = null;
+  var out = {id: id, reason: '', blockers: [], offer: [], longest: 0};
+  var hasAvail = s.avail.some(function(x){ return x.length; });
+  var overlap = []; for(var d = 0; d < 7; d++){ var ov = intersect(S.hours[d] || [], s.avail[d] || []); ov.forEach(function(x){ overlap.push({d: d, s: x[0], e: x[1]}); }); }
+  var longest = overlap.reduce(function(m, x){ return Math.max(m, x.e - x.s); }, 0);
+  out.longest = longest;
+  if(!hasAvail) out.reason = 'none';
+  else if(!overlap.length) out.reason = 'outside';
+  else if(!S.cand[idx].length) out.reason = 'short';
+  else {
+    out.reason = 'taken';
+    var who = {};
+    S.cand[idx].forEach(function(c){ S.conflicts(idx, c.d, c.t).forEach(function(j){ who[S.st[j].id] = 1; }); });
+    out.blockers = Object.keys(who);
+  }
+  // open stretches in the teacher's week long enough for this lesson (what to offer the family)
+  for(var dd = 0; dd < 7; dd++){
+    var busy = [];
+    S.st.forEach(function(o, j){ var p = S.pos[j]; if(p && p.d === dd) busy.push([p.t - S.buffer, p.t + o.len + S.buffer]); });
+    subtract(S.hours[dd] || [], busy).forEach(function(x){
+      var st0 = Math.ceil(x[0] / S.align) * S.align;
+      if(x[1] - st0 >= s.len) out.offer.push({d: dd, s: st0, e: x[1]});
+    });
+  }
+  return out;
+}
+
+/* who could take a given time: for the "who else fits here" view */
+function fitsAt(input, d, t){
+  var S = new Solver(input), out = [];
+  S.st.forEach(function(s, i){ if(S.canAt(i, d, t)) out.push(s.id); });
+  return out;
+}
+
+return {DAY_NAMES: DAY_NAMES, DAY_LONG: DAY_LONG, merge: merge, intersect: intersect, subtract: subtract, total: total, emptyWeek: emptyWeek,
+        fmt: fmt, fmtRange: fmtRange, parseAvail: parseAvail, availText: availText, parseRoster: parseRoster, parseLen: parseLen,
+        solve: solve, statsFor: statsFor, movesFor: movesFor, explain: explain, fitsAt: fitsAt, candidates: candidates, W: W, _Solver: Solver};
+})();
+/*CORE-END*/
+</script>
+<script>
+(function(){
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+var SITE = 'https://samsbench.com/lesson-slots/';
+var APP_KEY = 'lesson-slots';
+var VERIFY_URL = 'https://app-bizz-api.whop.site/api/verify';
+var CHECKOUT_HOME = 'https://whop.com/checkout/ch_kHJllgCr5hGDZwW/';
+var CHECKOUT_PLAN = 'https://whop.com/checkout/plan_bWRjqni3nXXed';
+var PRICE = '$19';
+var GIFT = [];                    // SHA-256 of gift codes handed out in letters; codes never go in the page
+var KEY = 'lsl.v1', PROKEY = 'lsl.pro', FREE_MAX = 12;
+var COLORS = ['#c0392b','#1f5fbf','#1e8449','#8e44ad','#d35400','#0e7c86','#c2185b','#6b7a12','#283593','#8d5524','#0277bd','#6a1b9a','#2e7d32','#ad1457','#455a64','#e65100'];
+var BGS =    ['#fbe3df','#e1ebfa','#dff2e6','#efe2f5','#fde9d9','#dcf1f2','#fadbe8','#eef1d6','#e1e4f6','#f1e5da','#dcedf9','#ecdff3','#e2f1e3','#f8dde9','#e5e9eb','#fde6d4'];
+
+/* ---------- measurement (GoatCounter). ?via follows the visitor down the funnel; one hit every 700 ms (GoatCounter drops >4/s). ---------- */
+var GC_CODE = 'lessonslots';
+var SRC = (function(){ try{
+  var q = new URLSearchParams(location.search), v = (q.get('via') || '').replace(/[^a-z0-9-]/g, '').slice(0, 20) || (q.get('a') ? 'aff' : '');
+  if(v){ sessionStorage.setItem('lsl.src', v); return v; }
+  return sessionStorage.getItem('lsl.src') || '';
+}catch(e){ return ''; } })();
+var FUNNEL_EV = {'tool-start':1, 'example':1, 'roster-read':1, 'schedule-made':1, 'schedule-used':1, 'print':1, 'copy-families':1, 'copy-ask':1, 'csv':1,
+                 'move':1, 'reroll':1, 'pro-notfound':1, 'pro-badcode':1, 'pro-view':1, 'pro-limit':1, 'buy-click':1, 'pro-unlocked':1, 'pro-gift':1, 'return-visit':1};
+var ONCE = {}, QUEUE = [], SENDING = false, GC_READY = 0;
+function track(name){
+  try{
+    if(SRC && FUNNEL_EV[name]) QUEUE.push(name + '.' + SRC);
+    if(!(SRC.indexOf('selftest') === 0 && FUNNEL_EV[name])) QUEUE.push(name);      // self-tests send only the tagged copy of funnel events, so the plain totals stay clean
+    drain();
+  }catch(e){}
+}
+function drain(){
+  if(SENDING || !QUEUE.length || !GC_CODE) return;
+  if(!(window.goatcounter && window.goatcounter.count)){ SENDING = true; setTimeout(function(){ SENDING = false; drain(); }, 400); return; }
+  if(!GC_READY) GC_READY = Date.now();
+  if(Date.now() - GC_READY < 1500){ SENDING = true; setTimeout(function(){ SENDING = false; drain(); }, 1500 - (Date.now() - GC_READY)); return; }
+  var n = QUEUE.shift(); SENDING = true;
+  try{ window.goatcounter.count({path: n, title: n, event: true}); }catch(e){}
+  setTimeout(function(){ SENDING = false; drain(); }, 700);
+}
+function trackOnce(name){ if(ONCE[name]) return; ONCE[name] = 1; track(name); }
+
+/* ---------- state ---------- */
+function lsGet(k, d){ try{ var t = localStorage.getItem(k); return t ? JSON.parse(t) : d; }catch(e){ return d; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+function defaultHours(){ var h = []; for(var d = 0; d < 7; d++) h.push(d < 4 ? [[900, 1140]] : []); return h; }
+function fresh(){ return {hours: defaultHours(), defLen: 30, align: 15, buffer: 0, students: [], place: null, seed: 1, example: false, nextId: 1}; }
+var S = lsGet(KEY, null);
+if(!S || !S.hours || !Array.isArray(S.students)) S = fresh();
+var hadData = S.students.length > 0;
+var PRO = lsGet(PROKEY, null);
+function isPro(){ return !!(PRO && (PRO.email || PRO.gift)); }
+function save(){ lsSet(KEY, S); }
+var SEL = null;       // selected student id on the board
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function say(t){ var d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role', 'status'); d.textContent = t; document.body.appendChild(d); setTimeout(function(){ d.remove(); }, 2600); }
+function famKey(s){ return (s.family || '').toLowerCase().trim() || ('#' + s.id); }
+function famColor(s){
+  var keys = []; S.students.forEach(function(x){ var k = famKey(x); if(keys.indexOf(k) < 0) keys.push(k); });
+  var i = keys.indexOf(famKey(s)) % COLORS.length; return {c: COLORS[i], bg: BGS[i]};
+}
+function studentInput(s){
+  var a = LS.parseAvail(s.availText, S.hours, s.len), p = s.prefText ? LS.parseAvail(s.prefText, S.hours, s.len) : {avail: LS.emptyWeek()};
+  return {id: s.id, name: s.name, family: s.family, len: +s.len || S.defLen, avail: a.avail, pref: p.avail, lock: s.pin || null};
+}
+function input(){ return {hours: S.hours, students: S.students.map(studentInput), buffer: +S.buffer, align: +S.align, seed: S.seed}; }
+function byId(id){ for(var i = 0; i < S.students.length; i++) if(S.students[i].id === id) return S.students[i]; return null; }
+function firstName(n){ return String(n).trim().split(/\s+/)[0]; }
+
+/* ---------- step 1: hours ---------- */
+var TIMES = []; for(var m = 6 * 60; m <= 22 * 60; m += 15) TIMES.push(m);
+function timeSel(val, cls){ return '<select class="' + cls + '">' + TIMES.map(function(t){ return '<option value="' + t + '"' + (t === val ? ' selected' : '') + '>' + LS.fmt(t) + '</option>'; }).join('') + '</select>'; }
+function renderHours(){
+  $('days').innerHTML = LS.DAY_LONG.map(function(D, d){
+    var b = S.hours[d] || [], on = b.length > 0;
+    var h = '<div class="day' + (on ? '' : ' off') + '" data-d="' + d + '"><label class="dn"><input type="checkbox" class="on"' + (on ? ' checked' : '') + '> ' + D + '</label>';
+    if(on){
+      b.forEach(function(x, k){ h += '<div class="blk" data-k="' + k + '">' + timeSel(x[0], 'f') + ' to ' + timeSel(x[1], 't') + (k ? ' <button class="rm" title="Remove this block" aria-label="Remove this block">×</button>' : '') + '</div>'; });
+      if(b.length < 2) h += '<div class="blk"><button class="btn ghost small addb">+ another block</button></div>';
+    }
+    return h + '</div>';
+  }).join('');
+  $('defLen').value = String(S.defLen); $('align').value = String(S.align); $('buffer').value = String(S.buffer);
+}
+$('days').addEventListener('change', function(e){
+  var dEl = e.target.closest('.day'); if(!dEl) return; var d = +dEl.dataset.d;
+  if(e.target.classList.contains('on')){ S.hours[d] = e.target.checked ? [d >= 5 ? [540, 720] : [900, 1140]] : []; }
+  else { var bl = e.target.closest('.blk'), k = +bl.dataset.k, f = +bl.querySelector('.f').value, t = +bl.querySelector('.t').value;
+    if(t <= f) t = Math.min(f + 60, 22 * 60);
+    S.hours[d][k] = [f, t]; S.hours[d] = LS.merge(S.hours[d]); }
+  changed(true); renderHours(); renderRoster();
+});
+$('days').addEventListener('click', function(e){
+  var dEl = e.target.closest('.day'); if(!dEl) return; var d = +dEl.dataset.d;
+  if(e.target.classList.contains('addb')){ var b = S.hours[d], last = b[b.length - 1]; var s0 = Math.min(last[1] + 60, 21 * 60); S.hours[d].push([s0, Math.min(s0 + 120, 22 * 60)]); S.hours[d] = LS.merge(S.hours[d]); }
+  else if(e.target.classList.contains('rm')){ S.hours[d].splice(+e.target.closest('.blk').dataset.k, 1); }
+  else return;
+  changed(true); renderHours(); renderRoster();
+});
+['defLen', 'align', 'buffer'].forEach(function(id){ $(id).addEventListener('change', function(){ S[id] = +this.value; changed(true); renderRoster(); }); });
+
+/* ---------- step 2: roster ---------- */
+function renderRoster(){
+  var w = $('rosterWrap');
+  if(!S.students.length){ w.innerHTML = ''; return; }
+  var bad = 0;
+  var rows = S.students.map(function(s){
+    var a = LS.parseAvail(s.availText, S.hours, s.len), txt = LS.availText(a.avail, S.hours), fits = LS.candidates({len: +s.len, avail: a.avail}, S.hours, +S.align, +S.buffer).length;
+    var note;
+    if(a.empty) { note = '<span class="bad">No times read. Type them like "Mon 3-5".</span>'; bad++; }
+    else if(!txt){ note = '<span class="bad">None of these times are in your teaching hours.</span>'; bad++; }
+    else if(!fits){ note = esc(txt) + ' · <span class="bad">no stretch long enough for ' + s.len + ' min</span>'; bad++; }
+    else note = esc(txt) + (fits <= 2 ? ' · <span class="tag red">' + (fits === 1 ? 'only 1 possible start' : 'only 2 possible starts') + '</span>' : '');
+    if(s.pin) note += ' · <span class="tag">📌 ' + LS.DAY_NAMES[s.pin.d] + ' ' + LS.fmt(s.pin.t) + '</span>';
+    return '<tr data-id="' + s.id + '"><td class="nm"><input type="text" data-f="name" value="' + esc(s.name) + '" aria-label="Student name"></td>' +
+      '<td class="fm"><input type="text" data-f="family" value="' + esc(s.family) + '" aria-label="Family" placeholder="family"></td>' +
+      '<td class="ln"><select data-f="len" aria-label="Lesson minutes">' + [15,20,25,30,40,45,50,60,75,90,120].concat([+s.len]).filter(function(v, i, A){ return A.indexOf(v) === i; }).sort(function(a, b){ return a - b; }).map(function(v){ return '<option' + (v === +s.len ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select></td>' +
+      '<td class="tx"><input type="text" data-f="availText" value="' + esc(s.availText) + '" aria-label="Times they can do" placeholder="e.g. Mon 3-5, Wed after 4"><div class="parsed">' + note + '</div></td>' +
+      '<td><button class="rm" title="Remove" aria-label="Remove ' + esc(s.name) + '">×</button></td></tr>';
+  }).join('');
+  w.innerHTML = '<table class="roster"><thead><tr><th>Student</th><th>Family</th><th>Min</th><th>Times they can do</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<p class="mini">' + S.students.length + ' students' + (bad ? ' · <b style="color:#8a1c16">' + bad + ' need a look</b>' : '') + (S.example ? ' · <span class="tag ex">sample studio</span>' : '') + '</p>';
+}
+$('rosterWrap').addEventListener('change', function(e){
+  var tr = e.target.closest('tr'); if(!tr) return; var s = byId(+tr.dataset.id), f = e.target.dataset.f; if(!s || !f) return;
+  s[f] = f === 'len' ? +e.target.value : e.target.value;
+  if(f !== 'name') s.pin = null;
+  userEdit(); changed(true); renderRoster();
+});
+$('rosterWrap').addEventListener('click', function(e){
+  if(!e.target.classList.contains('rm')) return;
+  var tr = e.target.closest('tr'); S.students = S.students.filter(function(s){ return s.id !== +tr.dataset.id; });
+  userEdit(); changed(true); renderRoster();
+});
+$('addRow').addEventListener('click', function(){
+  S.students.push({id: S.nextId++, name: 'New student', family: '', len: S.defLen, availText: '', prefText: ''});
+  userEdit(); changed(true); renderRoster();
+  var ins = $('rosterWrap').querySelectorAll('tr[data-id] input[data-f=name]'); if(ins.length){ ins[ins.length - 1].select(); ins[ins.length - 1].focus(); }
+});
+function userEdit(){ if(S.example){ S.example = false; } trackOnce('tool-start'); }
+$('readBtn').addEventListener('click', function(){
+  var t = $('paste').value;
+  if(!t.trim()){ $('readMsg').textContent = 'Paste or type at least one line first.'; return; }
+  var r = LS.parseRoster(t, S.defLen);
+  if(!r.students.length){ $('readMsg').textContent = 'Couldn\'t find any students in that. ' + (r.warnings[0] || ''); return; }
+  if(S.example){ S.students = []; S.example = false; }
+  r.students.forEach(function(s){ s.id = S.nextId++; S.students.push(s); });
+  $('paste').value = '';
+  $('readMsg').textContent = 'Added ' + r.students.length + ' student' + (r.students.length === 1 ? '' : 's') + '. Check the times below, then build your week.' + (r.warnings.length ? ' ' + r.warnings.join(' ') : '');
+  trackOnce('tool-start'); if(r.students.length >= 3) trackOnce('roster-read');
+  changed(true); renderRoster();
+});
+$('paste').addEventListener('input', function(){ trackOnce('tool-start'); });
+
+var EXAMPLE = "Emma Chen: Mon 3-5, Wed after 4:30\nLeo Chen: Mon 3-5, Wed after 4:30 (45 min)\nAva Patel: Tue/Thu 3:30-6\nNoah Williams: Mon 4-6, Thu 4-6\nMia Garcia: Wed 3-4:30 only\nLiam Johnson: after 5 any day but Wed\nSophia Kim: Tuesday 4:15\nJackson Kim: Tuesday 4:15 or Thursday 4:15\nOlivia Brown: weekdays before 5 (60 min)\nLucas Rossi: Mon-Thu 3-7\nIsabella Nguyen: M/W 3:30-5:30\nEthan Davis: Thu after school, prefer Thu 5\nAmelia Clark: Mon 6-7, Tue 6-7\nHarper Lee: Wed 4-6, Thu 3-4\nHenry Lee: Wed 4-6, Thu 3-4\nElla Martin: anytime\nBenjamin Scott: Tue 3-5; Wed 3-5 (45 min)\nGrace Walker: Mon 3:00-3:30, 3:30-4:00\nDaniel Young: Thu 5:30-7\nChloe Adams: Tue 5-7, not 6-6:30";
+function loadExample(){
+  S = fresh(); S.example = true;
+  EXAMPLE.split('\n').forEach(function(l){ var r = LS.parseRoster(l, 30); r.students.forEach(function(s){ s.id = S.nextId++; S.students.push(s); }); });
+  track('example'); renderHours(); renderRoster(); solve(); $('resultSec').scrollIntoView({behavior: 'smooth'});
+}
+$('goExample').addEventListener('click', function(){
+  if(S.students.length && !S.example && !confirm('Replace your students with the sample studio? (Your list will be gone.)')) return;
+  loadExample();
+});
+$('goPaste').addEventListener('click', function(){ $('rosterSec').scrollIntoView({behavior: 'smooth'}); setTimeout(function(){ $('paste').focus(); }, 400); });
+
+/* ---------- step 3: solve + board ---------- */
+var LAST = null;   // {inp, out}
+function changed(clearResult){ if(clearResult && S.place){ S.place = null; LAST = null; renderResult(); } save(); }
+function solve(){
+  if(!S.students.length){ $('result').innerHTML = '<p class="note">Add your students in step 2 first.</p>'; return; }
+  var inp = input(), out = LS.solve(inp);
+  S.place = out.place; LAST = {inp: inp, out: out}; SEL = null; save();
+  if(!S.example && S.students.length >= 3) trackOnce('schedule-made');
+  renderResult();
+}
+function solveSoon(){   // let the button show "Working…" before the (up to ~1 s) solve blocks the page
+  var b = $('solveBtn'); b.disabled = true; b.textContent = 'Working…';
+  setTimeout(function(){ try{ solve(); } finally { b.disabled = false; b.textContent = 'Build my week'; } }, 30);
+}
+$('solveBtn').addEventListener('click', solveSoon);
+$('rerollBtn').addEventListener('click', function(){ S.seed = (S.seed || 1) + 1; track('reroll'); solveSoon(); });
+function locked(){ return !isPro() && !S.example && S.students.length > FREE_MAX; }   // the sample studio (20) always shows in full
+
+function renderResult(){
+  var r = $('result'); $('rerollBtn').hidden = !LAST;
+  if(!LAST){ r.innerHTML = ''; return; }
+  var out = LAST.out, inp = LAST.inp, n = S.students.length, placed = n - out.unplaced.length, st = out.stats;
+  var days = []; for(var d = 0; d < 7; d++) if((S.hours[d] || []).length) days.push(d);
+  var html = '<div class="sum"><span class="big">' + (out.unplaced.length ? placed + ' of ' + n + ' fit' : 'All ' + n + ' fit') + '</span>';
+  if(st.sibPairs) html += '<span>' + st.sibAdj + ' of ' + st.sibPairs + ' sibling pair' + (st.sibPairs === 1 ? '' : 's') + ' back to back</span>';
+  html += '<span>' + (st.gapMin ? st.gapMin + ' min of gaps between lessons' : 'no gaps between lessons') + '</span>';
+  if(st.prefWanted) html += '<span>' + st.pref + ' of ' + st.prefWanted + ' got their preferred time</span>';
+  html += '</div>';
+  if(out.lockClash.length) html += '<p class="note warn">Two pinned lessons overlapped, so ' + out.lockClash.map(function(id){ return esc(byId(id).name); }).join(', ') + ' got unpinned.</p>';
+  if(locked()){
+    trackOnce('pro-limit');
+    html += '<div class="locked"><h3>Your week is ready: ' + (out.unplaced.length ? placed + ' of ' + n : 'all ' + n) + ' students placed.</h3><div class="days3">' +
+      days.map(function(d){ return '<span>' + LS.DAY_NAMES[d] + ': ' + (st.perDay[d] || 0) + ' lessons</span>'; }).join('') + '</div>' +
+      '<p>The free version shows and prints schedules up to ' + FREE_MAX + ' students. You have ' + n + '. Pro (' + PRICE + ' once) shows who goes where, the call list, and the printout.</p>' +
+      '<a class="btn" href="#proSec">See Pro</a></div>';
+    r.innerHTML = html; return;
+  }
+  html += board(days) + listView(days) + '<div id="moveBar" class="movebar"></div>';
+  if(out.unplaced.length) html += tray(inp, out);
+  html += '<div class="outs"><button class="btn" id="printBtn">Print the week</button><button class="btn ghost" id="copyFam">Copy times for each family</button><button class="btn ghost" id="csvBtn">Download spreadsheet (.csv)</button></div>';
+  r.innerHTML = html;
+  renderMoves();
+}
+var PX = 1.3;  // pixels per minute on the board
+function dayRange(days){
+  var lo = 24 * 60, hi = 0;
+  days.forEach(function(d){ (S.hours[d] || []).forEach(function(x){ lo = Math.min(lo, x[0]); hi = Math.max(hi, x[1]); }); });
+  S.students.forEach(function(s){ var p = S.place[s.id]; if(p){ lo = Math.min(lo, p.t); hi = Math.max(hi, p.t + (+s.len)); } });
+  return [Math.floor(lo / 60) * 60, Math.ceil(hi / 60) * 60];
+}
+function board(days){
+  var R = dayRange(days), H = (R[1] - R[0]) * PX, q = 15 * PX;
+  var h = '<div class="board" style="grid-template-columns:64px repeat(' + days.length + ',1fr)"><div class="hd"></div>' +
+    days.map(function(d){ return '<div class="hd">' + LS.DAY_LONG[d] + '</div>'; }).join('');
+  h += '<div class="axis" style="height:' + H + 'px">';
+  for(var t = R[0]; t <= R[1]; t += 60) h += '<i style="top:' + ((t - R[0]) * PX) + 'px">' + LS.fmt(t) + '</i>';
+  h += '</div>';
+  var moves = SEL != null ? LS.movesFor(LAST.inp, S.place, SEL) : [];
+  days.forEach(function(d){
+    h += '<div class="col" data-d="' + d + '" style="height:' + H + 'px"><div class="closed" style="top:0;height:' + H + 'px"></div>';
+    (S.hours[d] || []).forEach(function(x){ h += '<div class="open" style="--q:' + q + 'px;top:' + ((x[0] - R[0]) * PX) + 'px;height:' + ((x[1] - x[0]) * PX) + 'px"></div>'; });
+    var L = S.students.filter(function(s){ var p = S.place[s.id]; return p && p.d === d; }).sort(function(a, b){ return S.place[a.id].t - S.place[b.id].t; });
+    L.forEach(function(s, k){
+      var p = S.place[s.id], c = famColor(s), nb = L[k + 1], pb = L[k - 1];
+      var sib = (nb && famKey(nb) === famKey(s) && S.place[nb.id].t - (p.t + (+s.len)) <= 10 + (+S.buffer)) || (pb && famKey(pb) === famKey(s) && p.t - (S.place[pb.id].t + (+pb.len)) <= 10 + (+S.buffer));
+      h += '<button class="tile' + (SEL === s.id ? ' sel' : '') + (s.pin ? ' pin' : '') + (sib ? ' sib' : '') + '" data-id="' + s.id + '" style="--c:' + c.c + ';--bg:' + c.bg + ';top:' + ((p.t - R[0]) * PX + 1) + 'px;height:' + Math.max(18, (+s.len) * PX - 2) + 'px">' +
+        '<b>' + esc(s.name) + '</b><small>' + LS.fmtRange(p.t, p.t + (+s.len)) + '</small></button>';
+    });
+    moves.filter(function(mv){ return mv.d === d; }).forEach(function(mv){
+      var me = byId(SEL);
+      h += '<button class="spot' + (mv.kind === 'swap' ? ' swap' : '') + '" data-mv="' + d + ',' + mv.t + '" style="top:' + ((mv.t - R[0]) * PX + 1) + 'px;height:' + Math.max(16, (+me.len) * PX - 2) + 'px">' +
+        (mv.kind === 'swap' ? '⇄ swap with ' + esc(firstName(byId(mv.with).name)) : LS.fmt(mv.t)) + '</button>';
+    });
+    h += '</div>';
+  });
+  return h + '</div>';
+}
+function listView(days){
+  return '<div class="list">' + days.map(function(d){
+    var L = S.students.filter(function(s){ var p = S.place[s.id]; return p && p.d === d; }).sort(function(a, b){ return S.place[a.id].t - S.place[b.id].t; });
+    return '<div class="ld"><h3>' + LS.DAY_LONG[d] + '</h3>' + (L.length ? L.map(function(s){
+      var p = S.place[s.id], c = famColor(s);
+      return '<div class="li' + (SEL === s.id ? ' sel' : '') + '" data-id="' + s.id + '" tabindex="0" style="--c:' + c.c + ';--bg:' + c.bg + '"><span class="tm">' + LS.fmtRange(p.t, p.t + (+s.len)) + '</span><span>' + esc(s.name) + (s.pin ? ' 📌' : '') + '</span></div>';
+    }).join('') : '<p class="mini">No lessons.</p>') + '</div>';
+  }).join('') + '</div>';
+}
+function renderMoves(){
+  var bar = $('moveBar'); if(!bar) return;
+  if(SEL == null){ bar.innerHTML = ''; return; }
+  var s = byId(SEL); if(!s){ SEL = null; bar.innerHTML = ''; return; }
+  var mv = LS.movesFor(LAST.inp, S.place, SEL), p = S.place[SEL];
+  bar.innerHTML = '<div class="note"><b>' + esc(s.name) + '</b>' + (p ? ', ' + LS.DAY_NAMES[p.d] + ' ' + LS.fmtRange(p.t, p.t + (+s.len)) : '') + '. ' +
+    (mv.length ? 'It could also go:' : 'There\'s nowhere else in their times right now.') +
+    '<div class="opts2">' + mv.slice(0, 40).map(function(m){ return '<button class="btn ghost small" data-mv="' + m.d + ',' + m.t + '">' + LS.DAY_NAMES[m.d] + ' ' + LS.fmt(m.t) + (m.kind === 'swap' ? ' (swap with ' + esc(firstName(byId(m.with).name)) + ')' : '') + '</button>'; }).join('') + '</div>' +
+    '<div class="row" style="margin-top:8px"><button class="btn small" id="pinBtn">' + (s.pin ? 'Unpin' : '📌 Pin here') + '</button><button class="btn ghost small" id="unsel">Done</button></div></div>';
+}
+$('result').addEventListener('click', function(e){
+  var t = e.target.closest('[data-id],[data-mv],#pinBtn,#unsel,#printBtn,#copyFam,#csvBtn,.copyAsk');
+  if(!t) return;
+  if(t.id === 'printBtn') return doPrint();
+  if(t.id === 'copyFam') return copyFamilies();
+  if(t.id === 'csvBtn') return downloadCSV();
+  if(t.classList.contains('copyAsk')) return copyText(t.dataset.text, 'copy-ask', 'Copied. Paste it into a text or email.');
+  if(t.id === 'unsel'){ SEL = null; renderResult(); return; }
+  if(t.id === 'pinBtn'){ var s0 = byId(SEL); s0.pin = s0.pin ? null : S.place[SEL]; save(); LAST.inp = input(); renderResult(); renderRoster(); return; }
+  if(t.dataset.mv){
+    var a = t.dataset.mv.split(','), d = +a[0], tm = +a[1], me = byId(SEL), mv = LS.movesFor(LAST.inp, S.place, SEL).filter(function(m){ return m.d === d && m.t === tm; })[0];
+    if(!mv) return;
+    var old = S.place[SEL];
+    if(mv.kind === 'swap'){ var o = byId(mv.with); S.place[o.id] = old; if(o.pin) o.pin = old; }
+    S.place[SEL] = {d: d, t: tm}; me.pin = {d: d, t: tm};
+    if(LAST.out.unplaced.indexOf(SEL) >= 0) LAST.out.unplaced = LAST.out.unplaced.filter(function(x){ return x !== SEL; });
+    LAST.inp = input(); LAST.out.stats = statsNow(); track('move'); save(); renderResult(); renderRoster(); return;
+  }
+  if(t.dataset.id){ var id = +t.dataset.id; SEL = SEL === id ? null : id; renderResult(); var el = document.querySelector('[data-id="' + id + '"].sel'); if(el && el.focus) el.focus(); }
+});
+$('result').addEventListener('keydown', function(e){ if(e.key === 'Enter' && e.target.classList.contains('li')) e.target.click(); });
+function statsNow(){ return LS.statsFor(LAST.inp, S.place); }   // re-count after a hand move, same rules as the solver
+
+/* who didn't fit: why, and what to offer the family */
+function tray(inp, out){
+  var h = '<div class="tray"><h3>Didn\'t fit (' + out.unplaced.length + '): call or text these families</h3>';
+  out.unplaced.forEach(function(id){
+    var s = byId(id), x = LS.explain(inp, S.place, id); if(!s || !x) return;
+    var why;
+    if(x.reason === 'none') why = 'No times were read for them. Fix their times in step 2.';
+    else if(x.reason === 'outside') why = 'Their times (' + esc(LS.availText(studentInput(s).avail, null) || '?') + ') are outside your teaching hours.';
+    else if(x.reason === 'short') why = 'Their longest window inside your hours is ' + x.longest + ' min, and the lesson is ' + s.len + ' min.';
+    else why = 'Their times are taken by ' + x.blockers.map(function(b){ return esc(byId(+b) ? byId(+b).name : b); }).join(', ') + '.';
+    var offer = x.offer.slice(0, 6).map(function(o){ return LS.DAY_NAMES[o.d] + ' ' + (o.e - o.s > (+s.len) + 15 ? LS.fmtRange(o.s, o.e) : LS.fmt(o.s)); });
+    var msg = 'Hi! I\'m putting together the lesson schedule for this term. The times you gave me for ' + firstName(s.name) + ' are already full. ' +
+      (offer.length ? 'I still have ' + offer.slice(0, 4).join(', ') + ' open (' + s.len + ' min). Could any of those work?' : 'Could you send me a few more times that might work?');
+    h += '<div class="ask"><p><b>' + esc(s.name) + '</b> (' + s.len + ' min). ' + why + '</p>' +
+      '<p>' + (offer.length ? 'Open times you could offer: <b>' + esc(offer.join(' · ')) + '</b>' : 'Your week has no open stretch of ' + s.len + ' min left.') + '</p>' +
+      '<button class="btn ghost small copyAsk" data-text="' + esc(msg) + '">Copy a message to the family</button></div>';
+  });
+  return h + '</div>';
+}
+
+/* ---------- outputs ---------- */
+function used(kind){ track(kind); trackOnce('schedule-used'); }
+function copyText(t, ev, okMsg){
+  function done(){ if(ev) used(ev); say(okMsg || 'Copied.'); }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done, function(){ fallback(); }); }
+  else fallback();
+  function fallback(){ var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ say('Couldn\'t copy. Select the text and copy it by hand.'); } ta.remove(); }
+}
+function lessonsSorted(){
+  return S.students.filter(function(s){ return S.place[s.id]; }).sort(function(a, b){ var p = S.place[a.id], q = S.place[b.id]; return p.d - q.d || p.t - q.t; });
+}
+function copyFamilies(){
+  var fam = {}, order = [];
+  lessonsSorted().forEach(function(s){ var k = famKey(s); if(!fam[k]){ fam[k] = []; order.push(k); } fam[k].push(s); });
+  var t = order.map(function(k){
+    var L = fam[k], label = L[0].family ? L[0].family + ' family' : L[0].name;
+    return label + ':\n' + L.map(function(s){ var p = S.place[s.id]; return '  ' + s.name + ': ' + LS.DAY_LONG[p.d] + 's ' + LS.fmtRange(p.t, p.t + (+s.len)); }).join('\n');
+  }).join('\n\n');
+  copyText(t, 'copy-families', 'Copied every family\'s lesson times.');
+}
+function downloadCSV(){
+  var rows = [['Day', 'Start', 'End', 'Student', 'Family', 'Minutes']];
+  lessonsSorted().forEach(function(s){ var p = S.place[s.id]; rows.push([LS.DAY_LONG[p.d], LS.fmt(p.t), LS.fmt(p.t + (+s.len)), s.name, s.family, s.len]); });
+  (LAST.out.unplaced || []).forEach(function(id){ var s = byId(id); if(s) rows.push(['(not placed)', '', '', s.name, s.family, s.len]); });
+  var csv = rows.map(function(r){ return r.map(function(v){ v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(','); }).join('\r\n');
+  var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv'})); a.download = 'lesson-schedule.csv'; document.body.appendChild(a); a.click(); a.remove();
+  used('csv');
+}
+function doPrint(){
+  var days = []; for(var d = 0; d < 7; d++) if((S.hours[d] || []).length) days.push(d);
+  var h = '<h2 style="margin:0 0 6px">Lesson schedule</h2><div class="pa-week" style="grid-template-columns:repeat(' + days.length + ',1fr)">' + days.map(function(d){
+    var L = lessonsSorted().filter(function(s){ return S.place[s.id].d === d; });
+    return '<div class="pa-day"><h4>' + LS.DAY_LONG[d] + '</h4>' + L.map(function(s){ var p = S.place[s.id]; return '<div class="pa-l"><b>' + LS.fmtRange(p.t, p.t + (+s.len)) + '</b><span>' + esc(s.name) + '</span></div>'; }).join('') + '</div>';
+  }).join('') + '</div>';
+  if(LAST.out.unplaced.length) h += '<div class="pa-un"><b>Not placed yet:</b> ' + LAST.out.unplaced.map(function(id){ return esc(byId(id).name); }).join(', ') + '</div>';
+  h += '<div class="pa-foot">Made with Lesson Slots · samsbench.com/lesson-slots</div>';
+  $('printArea').innerHTML = h; used('print'); window.print();
+}
+
+/* ---------- pro ---------- */
+function buyUrl(){
+  var a = ''; try{ a = new URLSearchParams(location.search).get('a') || localStorage.getItem('lsl.aff') || ''; a = a.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40); if(a) localStorage.setItem('lsl.aff', a); }catch(e){}
+  return a ? CHECKOUT_PLAN + '?a=' + encodeURIComponent(a) : CHECKOUT_HOME;
+}
+function renderPro(){
+  $('buyLink').href = buyUrl(); $('proPrice').textContent = PRICE;
+  if(isPro()){
+    $('proBuy').hidden = true;
+    $('proState').innerHTML = '<p class="ok">Pro is on for this browser' + (PRO.email ? ' (' + esc(PRO.email) + ')' : '') + '. Thank you.</p>';
+  } else {
+    $('proBuy').hidden = false;
+    $('proState').innerHTML = /[?&]bought=1/.test(location.search) ? '<p class="ok">Thanks for buying! Enter the email you paid with to unlock.</p>' : '';
+  }
+}
+$('buyLink').addEventListener('click', function(){ track('buy-click'); });
+$('buyLink').addEventListener('auxclick', function(e){ if(e.button === 1) track('buy-click'); });
+function sha256hex(s){
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)).then(function(buf){
+    return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0' + b.toString(16)).slice(-2); }).join('');
+  });
+}
+var unlocking = false;
+function unlocked(){ renderPro(); renderResult(); }
+function unlock(){
+  var v = $('proKey').value.trim(), msg = $('proMsg');
+  if(unlocking) return;
+  if(!v){ msg.innerHTML = '<span class="err">Type the email you paid with, or your gift code.</span>'; return; }
+  if(v.indexOf('@') < 0){
+    if(!window.crypto || !crypto.subtle){ msg.innerHTML = '<span class="err">This browser can\'t check codes. Try another browser.</span>'; return; }
+    sha256hex(v.toUpperCase().replace(/\s+/g, '')).then(function(hx){
+      if(GIFT.indexOf(hx) >= 0){ PRO = {gift: hx.slice(0, 12)}; lsSet(PROKEY, PRO); track('pro-gift'); track('gift-' + hx.slice(0, 8)); msg.textContent = ''; unlocked(); say('Pro unlocked. Enjoy!'); }
+      else { track('pro-badcode'); msg.innerHTML = '<span class="err">That code didn\'t match. Check the letter, or use the email you paid with.</span>'; }
+    });
+    return;
+  }
+  unlocking = true; msg.textContent = 'Checking…';
+  fetch(VERIFY_URL, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({app: APP_KEY, email: v})})
+    .then(function(r){ if(!r.ok) throw new Error('http ' + r.status); return r.json(); })
+    .then(function(j){
+      unlocking = false;
+      if(j && j.ok && j.valid){ PRO = {email: v.toLowerCase()}; lsSet(PROKEY, PRO); track('pro-unlocked'); msg.textContent = ''; unlocked(); say('Pro unlocked. Thank you!'); }
+      else if(j && j.ok){ track('pro-notfound'); msg.innerHTML = '<span class="err">No purchase found for that email. Use the email you typed at checkout. Just paid? Wait a minute and try again.</span>'; }
+      else throw new Error('bad reply');
+    }).catch(function(){ unlocking = false; msg.innerHTML = '<span class="err">Couldn\'t reach the checker. Check your connection and try again.</span>'; });
+}
+$('proGo').addEventListener('click', unlock);
+$('proKey').addEventListener('keydown', function(e){ if(e.key === 'Enter') unlock(); });
+
+/* ---------- start ---------- */
+renderHours(); renderRoster(); renderPro();
+if(S.place && S.students.length){ var inp0 = input(); LAST = {inp: inp0, out: {place: S.place, unplaced: S.students.filter(function(s){ return !S.place[s.id]; }).map(function(s){ return s.id; }), lockClash: [], stats: {}}}; LAST.out.stats = statsNow(); renderResult(); }
+if(hadData && !S.example) track('return-visit');
+try{ var seenPro = false; new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting && !seenPro && !isPro()){ seenPro = true; track('pro-view'); } }); }, {threshold: 0.5}).observe($('proSec')); }catch(e){}
+if(GC_CODE){ var gs = document.createElement('script'); gs.async = true; gs.src = '//gc.zgo.at/count.js'; gs.setAttribute('data-goatcounter', 'https://' + GC_CODE + '.goatcounter.com/count'); document.head.appendChild(gs); }
+(function(){
+  var q = new URLSearchParams(location.search);
+  var via = (q.get('via') || '').replace(/[^a-z0-9-]/g, '').slice(0, 20), af = (q.get('a') || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
+  if(via) track('via-' + via);
+  if(af) track('aff-' + af);
+  if(q.get('bought') === '1' && !isPro()) setTimeout(function(){ $('proSec').scrollIntoView(); $('proKey').focus(); }, 400);
+  if(via.indexOf('selftest') === 0 && q.get('fire') === 'all'){   // live check only: every funnel event once, tagged .selftest (plain totals untouched)
+    Object.keys(FUNNEL_EV).forEach(function(n){ track(n); });
+    track('gift-selftest');
+  }
+})();
+window.LSL = {state: function(){ return S; }, last: function(){ return LAST; }, pending: function(){ return QUEUE.length + (SENDING ? 1 : 0); }, queue: function(){ return QUEUE.slice(); }};   // for tests
+})();
+</script>
+</body>
+</html>
