@@ -1198,18 +1198,21 @@ function cleanVia(v){ return String(v || '').toLowerCase().replace(/[^a-z0-9-]/g
    via-<code> keeps the full code (the ledger's "letters with share visits" counts via-ls012-s); funnel copies use the group:
    lsl = a letter recipient, lss = someone they passed it to. A browser that came in on ls012 and then opens ls012-s is the
    recipient checking their own pass-on link: no via event, still counted as lsl. */
-var VIA_EV = '', OWN_VIA = '';
+var VIA_EV = '', OWN_VIA = '', UNSHARE = '';
 var SRC = (function(){ try{
   var q = new URLSearchParams(location.search), raw = cleanVia(q.get('via')), v = raw || (q.get('a') ? 'aff' : '');
   VIA_EV = raw;
   var m = /^ls(\d{3})(-s)?$/.exec(raw);
   if(m){
     var seen = []; try{ seen = JSON.parse(localStorage.getItem('lsl.vias') || '[]'); if(!Array.isArray(seen)) seen = []; }catch(e){ seen = []; }
-    if(!m[2] && seen.indexOf(raw) < 0){ seen.push(raw); try{ localStorage.setItem('lsl.vias', JSON.stringify(seen.slice(-20))); }catch(e){} }
+    var shared = []; try{ shared = JSON.parse(localStorage.getItem('lsl.shared') || '[]'); if(!Array.isArray(shared)) shared = []; }catch(e){ shared = []; }
+    if(!m[2] && seen.indexOf(raw) < 0){ seen.push(raw); try{ localStorage.setItem('lsl.vias', JSON.stringify(seen.slice(-20))); }catch(e){}
+      if(shared.indexOf(raw) >= 0) UNSHARE = raw; }   // this browser fired via-<raw>-s earlier, so it was the recipient, not a pass-on: ledger subtracts unshare-<raw>
     var mine = m[2] && seen.indexOf('ls' + m[1]) >= 0;
     if(mine) VIA_EV = '';
     OWN_VIA = 'ls' + m[1];
     try{ localStorage.setItem('lsl.own', OWN_VIA); }catch(e){}
+    if(m[2] && !mine && shared.indexOf(OWN_VIA) < 0){ shared.push(OWN_VIA); try{ localStorage.setItem('lsl.shared', JSON.stringify(shared.slice(-20))); }catch(e){} }
     v = (m[2] && !mine) ? 'lss' : 'lsl';
   }
   if(v){ sessionStorage.setItem('lsl.src', v); if(v.indexOf('selftest') !== 0){ var o1 = JSON.parse(localStorage.getItem('lsl.src1') || 'null'); if(!o1 || Date.now() - o1.at > 30 * 864e5) localStorage.setItem('lsl.src1', JSON.stringify({v: v, at: Date.now()})); } return v; }
@@ -1795,6 +1798,7 @@ if(GC_CODE){ var gs = document.createElement('script'); gs.async = true; gs.src 
   var q = new URLSearchParams(location.search);
   var via = VIA_EV, af = (q.get('a') || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
   var seen = {}; try{ seen = JSON.parse(sessionStorage.getItem('lsl.seen') || '{}'); }catch(e){}
+  if(UNSHARE) track('unshare-' + UNSHARE);
   if(via && !seen[via]){ track('via-' + via); seen[via] = 1; try{ sessionStorage.setItem('lsl.seen', JSON.stringify(seen)); }catch(e){} }   // once per tab, not per reload
   if(af) track('aff-' + af);
   if(q.get('bought') === '1' && !isPro()) setTimeout(function(){ $('proSec').scrollIntoView(); $('proKey').focus(); }, 400);
