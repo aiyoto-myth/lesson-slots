@@ -1764,7 +1764,7 @@ function unlock(){
   if(!v){ msg.innerHTML = '<span class="err">Type the email you paid with, or your gift code.</span>'; return; }
   if(v.indexOf('@') < 0){
     if(!window.crypto || !crypto.subtle){ msg.innerHTML = '<span class="err">This browser can\'t check codes. Try another browser.</span>'; return; }
-    sha256hex(v.toUpperCase().replace(/[\s\-–]+/g, '')).then(function(hx){
+    sha256hex(v.toUpperCase().replace(/[^A-Z0-9]/g, '')).then(function(hx){
       if(GIFT.indexOf(hx) >= 0){ PRO = {gift: hx.slice(0, 12)}; lsSet(PROKEY, PRO); track('pro-gift'); track('gift-' + hx.slice(0, 8)); msg.textContent = ''; unlocked(); say('Pro unlocked. Enjoy!'); }
       else { track('pro-badcode'); msg.innerHTML = '<span class="err">That code didn\'t match. Check the letter, or use the email you paid with.</span>'; }
     });
