@@ -254,6 +254,7 @@ footer p{margin:6px 0}
 
   <footer>
     <p>Everything you type stays in this browser. Student names never leave your computer. The page counts visits anonymously, and checks your purchase email only when you unlock Pro.</p>
+    <p>Know a teacher who builds their week by hand? <button class="btn ghost small" id="passBtn">Copy a link to send them</button></p>
     <p>Lesson Slots is made by Sam's Bench · <a href="https://samsbench.com/">samsbench.com</a></p>
   </footer>
 </div>
@@ -1193,15 +1194,32 @@ var BGS =    ['#fbe3df','#e1ebfa','#dff2e6','#efe2f5','#fde9d9','#dcf1f2','#fadb
 /* ---------- measurement (GoatCounter). ?via follows the visitor down the funnel; one hit every 700 ms (GoatCounter drops >4/s). ---------- */
 var GC_CODE = 'lessonslots';
 function cleanVia(v){ return String(v || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 20); }
+/* Letters (FACTORY 7, 11-25): each recipient gets ?via=ls012 for themselves and ?via=ls012-s to pass on (bond-hours / fuzzy-grid scheme).
+   via-<code> keeps the full code (the ledger's "letters with share visits" counts via-ls012-s); funnel copies use the group:
+   lsl = a letter recipient, lss = someone they passed it to. A browser that came in on ls012 and then opens ls012-s is the
+   recipient checking their own pass-on link: no via event, still counted as lsl. */
+var VIA_EV = '', OWN_VIA = '';
 var SRC = (function(){ try{
-  var q = new URLSearchParams(location.search), v = cleanVia(q.get('via')) || (q.get('a') ? 'aff' : '');
+  var q = new URLSearchParams(location.search), raw = cleanVia(q.get('via')), v = raw || (q.get('a') ? 'aff' : '');
+  VIA_EV = raw;
+  var m = /^ls(\d{3})(-s)?$/.exec(raw);
+  if(m){
+    var seen = []; try{ seen = JSON.parse(localStorage.getItem('lsl.vias') || '[]'); if(!Array.isArray(seen)) seen = []; }catch(e){ seen = []; }
+    if(!m[2] && seen.indexOf(raw) < 0){ seen.push(raw); try{ localStorage.setItem('lsl.vias', JSON.stringify(seen.slice(-20))); }catch(e){} }
+    var mine = m[2] && seen.indexOf('ls' + m[1]) >= 0;
+    if(mine) VIA_EV = '';
+    OWN_VIA = 'ls' + m[1];
+    try{ localStorage.setItem('lsl.own', OWN_VIA); }catch(e){}
+    v = (m[2] && !mine) ? 'lss' : 'lsl';
+  }
   if(v){ sessionStorage.setItem('lsl.src', v); if(v.indexOf('selftest') !== 0){ var o1 = JSON.parse(localStorage.getItem('lsl.src1') || 'null'); if(!o1 || Date.now() - o1.at > 30 * 864e5) localStorage.setItem('lsl.src1', JSON.stringify({v: v, at: Date.now()})); } return v; }
   var ss = sessionStorage.getItem('lsl.src'); if(ss) return ss;
   var lt = JSON.parse(localStorage.getItem('lsl.src1') || 'null');                       // first touch, 30 days: the tab Whop sends buyers back to
   return lt && Date.now() - lt.at < 30 * 864e5 ? cleanVia(lt.v) : '';
 }catch(e){ return ''; } })();
+function passLink(){ var own = OWN_VIA; if(!own){ try{ own = localStorage.getItem('lsl.own') || ''; }catch(e){} } return SITE + '?via=' + (/^ls\d{3}$/.test(own) ? own + '-s' : 'share'); }
 var FUNNEL_EV = {'tool-start':1, 'example':1, 'roster-read':1, 'schedule-made':1, 'schedule-used':1, 'print':1, 'copy-families':1, 'copy-ask':1, 'csv':1,
-                 'move':1, 'move-outside':1, 'keep-fit':1, 'undo':1, 'reroll':1, 'pro-notfound':1, 'pro-badcode':1, 'pro-view':1, 'pro-limit':1, 'buy-click':1, 'pro-unlocked':1, 'pro-gift':1, 'return-visit':1, 'bought-return':1};
+                 'move':1, 'move-outside':1, 'keep-fit':1, 'undo':1, 'reroll':1, 'pro-notfound':1, 'pro-badcode':1, 'pro-view':1, 'pro-limit':1, 'buy-click':1, 'pro-unlocked':1, 'pro-gift':1, 'return-visit':1, 'bought-return':1, 'pass-copy':1};
 var ONCE = {}, QUEUE = [], SENDING = false, GC_READY = 0;
 function track(name){
   try{
@@ -1771,10 +1789,11 @@ if(S.place && S.students.length){ syncLast(); renderResult(); }
 if(hadData && !S.example && !/[?&]bought=1/.test(location.search)){ try{ if(!sessionStorage.getItem('lsl.rv')){ sessionStorage.setItem('lsl.rv', '1'); track('return-visit'); } }catch(e){ track('return-visit'); } }
 if(/[?&]bought=1/.test(location.search)){ try{ if(!sessionStorage.getItem('lsl.br')){ sessionStorage.setItem('lsl.br', '1'); track('bought-return'); } }catch(e){} }
 try{ var seenPro = false; new IntersectionObserver(function(es){ es.forEach(function(x){ if(x.isIntersecting && !seenPro && !isPro()){ seenPro = true; track('pro-view'); } }); }, {threshold: 0.5}).observe($('proSec')); }catch(e){}
+$('passBtn').onclick = function(){ copyText(passLink(), null, 'Link copied. Paste it in an email or a message.'); track('pass-copy'); };
 if(GC_CODE){ var gs = document.createElement('script'); gs.async = true; gs.src = '//gc.zgo.at/count.js'; gs.setAttribute('data-goatcounter', 'https://' + GC_CODE + '.goatcounter.com/count'); document.head.appendChild(gs); }
 (function(){
   var q = new URLSearchParams(location.search);
-  var via = cleanVia(q.get('via')), af = (q.get('a') || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
+  var via = VIA_EV, af = (q.get('a') || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
   var seen = {}; try{ seen = JSON.parse(sessionStorage.getItem('lsl.seen') || '{}'); }catch(e){}
   if(via && !seen[via]){ track('via-' + via); seen[via] = 1; try{ sessionStorage.setItem('lsl.seen', JSON.stringify(seen)); }catch(e){} }   // once per tab, not per reload
   if(af) track('aff-' + af);
@@ -1784,7 +1803,7 @@ if(GC_CODE){ var gs = document.createElement('script'); gs.async = true; gs.src 
     track('gift-selftest');
   }
 })();
-window.LSL = {state: function(){ return S; }, last: function(){ return LAST; }, pending: function(){ return QUEUE.length + (SENDING ? 1 : 0); }, queue: function(){ return QUEUE.slice(); }};   // for tests
+window.LSL = {state: function(){ return S; }, last: function(){ return LAST; }, pending: function(){ return QUEUE.length + (SENDING ? 1 : 0); }, queue: function(){ return QUEUE.slice(); }, passLink: passLink};   // for tests
 })();
 </script>
 </body>
