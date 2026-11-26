@@ -1312,13 +1312,13 @@ function teachDays(){ var o = []; for(var d = 0; d < 7; d++) if((S.hours[d] || [
 
 /* ---------- step 1: hours ---------- */
 var TIMES = []; for(var m = 6 * 60; m <= 22 * 60; m += 15) TIMES.push(m);
-function timeSel(val, cls){ return '<select class="' + cls + '">' + TIMES.map(function(t){ return '<option value="' + t + '"' + (t === val ? ' selected' : '') + '>' + LS.fmt(t) + '</option>'; }).join('') + '</select>'; }
+function timeSel(val, cls, label){ return '<select class="' + cls + '" aria-label="' + label + '">' + TIMES.map(function(t){ return '<option value="' + t + '"' + (t === val ? ' selected' : '') + '>' + LS.fmt(t) + '</option>'; }).join('') + '</select>'; }
 function renderHours(){
   $('days').innerHTML = LS.DAY_LONG.map(function(D, d){
     var b = S.hours[d] || [], on = b.length > 0;
     var h = '<div class="day' + (on ? '' : ' off') + '" data-d="' + d + '"><label class="dn"><input type="checkbox" class="on"' + (on ? ' checked' : '') + '> ' + D + '</label>';
     if(on){
-      b.forEach(function(x, k){ h += '<div class="blk" data-k="' + k + '">' + timeSel(x[0], 'f') + ' to ' + timeSel(x[1], 't') + (k ? ' <button class="rm" title="Remove this block" aria-label="Remove this block">×</button>' : '') + '</div>'; });
+      b.forEach(function(x, k){ h += '<div class="blk" data-k="' + k + '">' + timeSel(x[0], 'f', D + ' from') + ' to ' + timeSel(x[1], 't', D + ' until') + (k ? ' <button class="rm" title="Remove this block" aria-label="Remove this block">×</button>' : '') + '</div>'; });
       h += '<div class="blk">' + (b.length < 3 ? '<button class="btn ghost small addb">+ another block</button>' : '') + '<label class="mini"><input type="checkbox" class="lr"' + (S.lastResort.indexOf(d) >= 0 ? ' checked' : '') + '> only if needed</label></div>';
     }
     return h + '</div>';
